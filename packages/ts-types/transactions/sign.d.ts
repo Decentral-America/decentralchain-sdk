@@ -1,6 +1,9 @@
 import {
-    IMassTransferItem,
-    ITransaction,
+    IAliasTransaction,
+    IBurnTransaction, ICancelLeaseTransaction, IDataTransaction,
+    IIssueTransaction, ILeaseTransaction,
+    IMassTransferItem, IMassTransferTransaction, IReissueTransaction, ISetScriptTransaction, ISponsorship,
+    ITransaction, ITransferTransaction,
     IWithChainId,
     IWithId,
     IWithProofs,
@@ -11,7 +14,34 @@ import {
 
 export namespace sign {
 
-    export interface IIssueTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion>, IWithChainId {
+    export type TTransaction<LONG> =
+        IIssueTransaction<LONG> |
+        ITransferTransaction<LONG> |
+        IReissueTransaction<LONG> |
+        IBurnTransaction<LONG> |
+        ILeaseTransaction<LONG> |
+        ICancelLeaseTransaction<LONG> |
+        IAliasTransaction<LONG> |
+        IMassTransferTransaction<LONG> |
+        IDataTransaction<LONG> |
+        ISetScriptTransaction<LONG> |
+        ISponsorship<LONG>
+
+    export type TTransactionMap<LONG> = {
+        [TRANSACTION_TYPE.ISSUE]: IIssueTransaction<LONG>,
+        [TRANSACTION_TYPE.TRANSFER]: ITransferTransaction<LONG>,
+        [TRANSACTION_TYPE.REISSUE]: IReissueTransaction<LONG>,
+        [TRANSACTION_TYPE.BURN]: IBurnTransaction<LONG>,
+        [TRANSACTION_TYPE.LEASE]: ILeaseTransaction<LONG>,
+        [TRANSACTION_TYPE.CANCEL_LEASE]: ICancelLeaseTransaction<LONG>,
+        [TRANSACTION_TYPE.ALIAS]: IAliasTransaction<LONG>,
+        [TRANSACTION_TYPE.MASS_TRANSFER]: IMassTransferTransaction<LONG>,
+        [TRANSACTION_TYPE.DATA]: IDataTransaction<LONG>,
+        [TRANSACTION_TYPE.SET_SCRIPT]: ISetScriptTransaction<LONG>,
+        [TRANSACTION_TYPE.SPONSORSHIP]: ISponsorship<LONG>
+    };
+
+    export interface IIssueTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
         type: TRANSACTION_TYPE.ISSUE
         name: string;
         description: string;
@@ -31,17 +61,19 @@ export namespace sign {
         attachment?: string;
     }
 
-    export interface IReissueTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion>, IWithChainId {
+    export interface IReissueTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
         type: TRANSACTION_TYPE.REISSUE;
         assetId: string;
         quantity: LONG;
         reissuable: boolean;
+        chainId: number;
     }
 
-    export interface IBurnTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion>, IWithChainId {
+    export interface IBurnTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
         type: TRANSACTION_TYPE.BURN;
         assetId: string;
         quantity: LONG;
+        chainId: number;
     }
 
     export interface ILeaseTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
@@ -50,9 +82,10 @@ export namespace sign {
         recipient: string;
     }
 
-    export interface ICancelLeaseTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion>, IWithChainId {
+    export interface ICancelLeaseTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
         type: TRANSACTION_TYPE.CANCEL_LEASE;
         leaseId: string;
+        chainId: number;
     }
 
     export interface IAliasTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
@@ -72,13 +105,15 @@ export namespace sign {
         data: Array<TDataTransactionEntry<LONG>>;
     }
 
-    export interface ISetScriptTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion>, IWithChainId {
+    export interface ISetScriptTransaction<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
         type: TRANSACTION_TYPE.SET_SCRIPT;
+        chainId: number;
         script: string | null //base64
     }
 
-    export interface ISponsorship<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion>, IWithChainId {
+    export interface ISponsorship<LONG> extends ITransaction<LONG>, Partial<IWithId>, Partial<IWithProofs>, Partial<IWithSender>, Partial<IWithVersion> {
         type: TRANSACTION_TYPE.SPONSORSHIP;
+        chainId: number;
         assetId: string;
         minSponsoredAssetFee: LONG;
     }

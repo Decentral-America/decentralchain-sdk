@@ -69,6 +69,33 @@ export interface ITransaction<LONG> {
 }
 
 
+export type TTransaction<LONG> =
+    IIssueTransaction<LONG> |
+    ITransferTransaction<LONG> |
+    IReissueTransaction<LONG> |
+    IBurnTransaction<LONG> |
+    ILeaseTransaction<LONG> |
+    ICancelLeaseTransaction<LONG> |
+    IAliasTransaction<LONG> |
+    IMassTransferTransaction<LONG> |
+    IDataTransaction<LONG> |
+    ISetScriptTransaction<LONG> |
+    ISponsorship<LONG>
+
+export type TTransactionMap<LONG> = {
+    [TRANSACTION_TYPE.ISSUE]: IIssueTransaction<LONG>,
+    [TRANSACTION_TYPE.TRANSFER]: ITransferTransaction<LONG>,
+    [TRANSACTION_TYPE.REISSUE]: IReissueTransaction<LONG>,
+    [TRANSACTION_TYPE.BURN]: IBurnTransaction<LONG>,
+    [TRANSACTION_TYPE.LEASE]: ILeaseTransaction<LONG>,
+    [TRANSACTION_TYPE.CANCEL_LEASE]: ICancelLeaseTransaction<LONG>,
+    [TRANSACTION_TYPE.ALIAS]: IAliasTransaction<LONG>,
+    [TRANSACTION_TYPE.MASS_TRANSFER]: IMassTransferTransaction<LONG>,
+    [TRANSACTION_TYPE.DATA]: IDataTransaction<LONG>,
+    [TRANSACTION_TYPE.SET_SCRIPT]: ISetScriptTransaction<LONG>,
+    [TRANSACTION_TYPE.SPONSORSHIP]: ISponsorship<LONG>
+};
+
 export interface IIssueTransaction<LONG> extends ITransaction<LONG> {
     type: TRANSACTION_TYPE.ISSUE
     name: string;
@@ -80,7 +107,7 @@ export interface IIssueTransaction<LONG> extends ITransaction<LONG> {
     script?: string;
 }
 
-export interface TransferTransaction<LONG> extends ITransaction<LONG> {
+export interface ITransferTransaction<LONG> extends ITransaction<LONG> {
     type: TRANSACTION_TYPE.TRANSFER;
     recipient: string;
     amount: LONG;

@@ -1,6 +1,6 @@
 import {
     IMassTransferItem,
-    ITransaction, IWithChainId,
+    ITransaction,
     IWithId,
     IWithProofs,
     IWithSender, IWithVersion,
@@ -10,14 +10,41 @@ import {
 
 export namespace api {
 
-    export interface IIssueTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion, IWithChainId {
+    export type TTransaction<LONG> =
+        IIssueTransaction<LONG> |
+        ITransferTransaction<LONG> |
+        IReissueTransaction<LONG> |
+        IBurnTransaction<LONG> |
+        ILeaseTransaction<LONG> |
+        ICancelLeaseTransaction<LONG> |
+        IAliasTransaction<LONG> |
+        IMassTransferTransaction<LONG> |
+        IDataTransaction<LONG> |
+        ISetScriptTransaction<LONG> |
+        ISponsorship<LONG>
+
+    export type TTransactionMap<LONG> = {
+        [TRANSACTION_TYPE.ISSUE]: IIssueTransaction<LONG>,
+        [TRANSACTION_TYPE.TRANSFER]: ITransferTransaction<LONG>,
+        [TRANSACTION_TYPE.REISSUE]: IReissueTransaction<LONG>,
+        [TRANSACTION_TYPE.BURN]: IBurnTransaction<LONG>,
+        [TRANSACTION_TYPE.LEASE]: ILeaseTransaction<LONG>,
+        [TRANSACTION_TYPE.CANCEL_LEASE]: ICancelLeaseTransaction<LONG>,
+        [TRANSACTION_TYPE.ALIAS]: IAliasTransaction<LONG>,
+        [TRANSACTION_TYPE.MASS_TRANSFER]: IMassTransferTransaction<LONG>,
+        [TRANSACTION_TYPE.DATA]: IDataTransaction<LONG>,
+        [TRANSACTION_TYPE.SET_SCRIPT]: ISetScriptTransaction<LONG>,
+        [TRANSACTION_TYPE.SPONSORSHIP]: ISponsorship<LONG>
+    };
+
+    export interface IIssueTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion {
         type: TRANSACTION_TYPE.ISSUE
+        chainId: number;
         name: string;
         description: string;
         decimals: number;
         quantity: LONG;
         reissuable: boolean;
-        chainId: number;
         script?: string;
     }
 
@@ -30,15 +57,17 @@ export namespace api {
         attachment: string;
     }
 
-    export interface IReissueTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion, IWithChainId {
+    export interface IReissueTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion {
         type: TRANSACTION_TYPE.REISSUE;
+        chainId: number;
         assetId: string;
         quantity: LONG;
         reissuable: boolean;
     }
 
-    export interface IBurnTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion, IWithChainId {
+    export interface IBurnTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion {
         type: TRANSACTION_TYPE.BURN;
+        chainId: number;
         assetId: string;
         quantity: LONG;
     }
@@ -49,8 +78,9 @@ export namespace api {
         recipient: string;
     }
 
-    export interface ICancelLeaseTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion, IWithChainId {
+    export interface ICancelLeaseTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion {
         type: TRANSACTION_TYPE.CANCEL_LEASE;
+        chainId: number;
         leaseId: string;
     }
 
@@ -71,13 +101,15 @@ export namespace api {
         data: Array<TDataTransactionEntry<LONG>>;
     }
 
-    export interface ISetScriptTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion, IWithChainId {
+    export interface ISetScriptTransaction<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion {
         type: TRANSACTION_TYPE.SET_SCRIPT;
+        chainId: number;
         script: string | null //base64
     }
 
-    export interface ISponsorship<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion, IWithChainId {
+    export interface ISponsorship<LONG> extends ITransaction<LONG>, IWithId, IWithProofs, IWithSender, IWithVersion {
         type: TRANSACTION_TYPE.SPONSORSHIP;
+        chainId: number;
         assetId: string;
         minSponsoredAssetFee: LONG;
     }
