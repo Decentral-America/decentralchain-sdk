@@ -31,9 +31,9 @@ const getDataTxFieldTypeByCode = (fieldTypeCode: any) => {
 };
 
 
-export type parser<T> = (value: Uint8Array, start: number) => {value: T, shift: number}
+export type TParser<T> = (value: Uint8Array, start: number) => {value: T, shift: number}
 
-export const P_OPTION = <T>(p: parser<T>) => (value: Uint8Array, start = 0) =>
+export const P_OPTION = <T>(p: TParser<T>) => (value: Uint8Array, start = 0) =>
   value[start] === 0 ? {value: undefined, shift: 1} : p(value, start + 1);
 
 export const byteToLong = (shift: number) => (bytes: Uint8Array, start: number) => {

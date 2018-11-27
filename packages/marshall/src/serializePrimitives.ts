@@ -8,50 +8,50 @@ const stringToUint8Array = (str: string) =>
 
 type Option<T> = T | null | undefined
 
-export type serializer<T> = (value: T) => Uint8Array
+export type TSerializer<T> = (value: T) => Uint8Array
 
 export const empty: Uint8Array = Uint8Array.from([]);
 export const zero: Uint8Array = Uint8Array.from([0]);
 export const one: Uint8Array = Uint8Array.from([1]);
 
-export const BASE58_STRING: serializer<string> = (value: string) => base58.decode(value);
+export const BASE58_STRING: TSerializer<string> = (value: string) => base58.decode(value);
 
-export const BASE64_STRING: serializer<string> = (value: string) => Base64.toByteArray(value);
+export const BASE64_STRING: TSerializer<string> = (value: string) => Base64.toByteArray(value);
 
-export const STRING: serializer<Option<string>> = (value: Option<string>) => value ? stringToUint8Array(value) : empty;
+export const STRING: TSerializer<Option<string>> = (value: Option<string>) => value ? stringToUint8Array(value) : empty;
 
-export const BYTE: serializer<number> = (value: number) => Uint8Array.from([value]);
+export const BYTE: TSerializer<number> = (value: number) => Uint8Array.from([value]);
 
-export const BOOL: serializer<boolean> = (value: boolean) => BYTE(value == true ? 1 : 0);
+export const BOOL: TSerializer<boolean> = (value: boolean) => BYTE(value == true ? 1 : 0);
 
-export const BYTES: serializer<Uint8Array | number[]> = (value: Uint8Array | number[]) => Uint8Array.from(value);
+export const BYTES: TSerializer<Uint8Array | number[]> = (value: Uint8Array | number[]) => Uint8Array.from(value);
 
-export const SHORT: serializer<number> = (value: number) => {
+export const SHORT: TSerializer<number> = (value: number) => {
   const s = Long.fromNumber(value, true);
   return Uint8Array.from(s.toBytesBE().slice(6))
 }
-export const INT: serializer<number> = (value: number) => {
+export const INT: TSerializer<number> = (value: number) => {
   const i = Long.fromNumber(value, true);
   return Uint8Array.from(i.toBytesBE().slice(4))
 }
-export const OPTION = <T, R = T | null | undefined>(s: serializer<T>): serializer<R> => (value: R) =>
+export const OPTION = <T, R = T | null | undefined>(s: TSerializer<T>): TSerializer<R> => (value: R) =>
   value == null
   || (typeof value == 'string' && value.length == 0)
     ? zero : concat(one, s(value as any));
 
-export const LEN = (lenSerializer: serializer<number>) => <T>(valueSerializer: serializer<T>): serializer<T> => (value: T) => {
+export const LEN = (lenSerializer: TSerializer<number>) => <T>(valueSerializer: TSerializer<T>): TSerializer<T> => (value: T) => {
   const data = valueSerializer(value);
   const len = lenSerializer(data.length);
   return concat(len, data)
 }
 
-export const COUNT = (countSerializer: serializer<number>) => <T>(itemSerializer: serializer<T>) => (items: T[]) => {
+export const COUNT = (countSerializer: TSerializer<number>) => <T>(itemSerializer: TSerializer<T>) => (items: T[]) => {
   const data = concat(...items.map(x => itemSerializer(x)))
   const len = countSerializer(items.length)
   return concat(len, data)
 }
 
-export const LONG: serializer<number | string> = (value: number | string) => {
+export const LONG: TSerializer<number | string> = (value: number | string) => {
   let l: Long;
   if (typeof value === 'number') {
     if (value > 2 ** 53 - 1) {
@@ -64,4 +64,4 @@ export const LONG: serializer<number | string> = (value: number | string) => {
   return Uint8Array.from(l.toBytesBE())
 }
 
-export const SCRIPT: serializer<string | null> = (script) => OPTION(LEN(SHORT)(BASE64_STRING))(script ? script.slice(7) : null);
+export const SCRIPT: TSerializer<string | null> = (script) => OPTION(LEN(SHORT)(BASE64_STRING))(script ? script.slice(7) : null);

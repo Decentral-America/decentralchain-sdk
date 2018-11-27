@@ -9,7 +9,7 @@ import {
   LONG,
   OPTION, SCRIPT,
   SHORT,
-  STRING
+  STRING, TSerializer
 } from './serializePrimitives';
 import {
   byteNewAliasToString, byteToAddressOrAlias,
@@ -17,7 +17,7 @@ import {
   byteToLong,
   byteToNumber, byteToScript,
   byteToStringWithLength, byteToTransfers,
-  getNumberFromBytes, P_OPTION
+  getNumberFromBytes, P_OPTION, TParser
 } from './parsePrimitives'
 import {concat} from './libs/utils'
 
@@ -49,9 +49,19 @@ const typeMap: any = {
   _: ['binary', 2, LEN(SHORT)(BYTES)],
 }
 
-const parseHeader = (bytes: Uint8Array): { type: number, version: number } => ({
+export const parseHeader = (bytes: Uint8Array): { type: number, version: number } => ({
   type: getNumberFromBytes(bytes, 1),
   version: getNumberFromBytes(bytes, 1, 1)
+})
+
+
+const createProcessor = <T, R extends IFieldProcessor<T>>(fields: R[]) => ({
+  toBytes: (tx: any) => concat(
+    ...fields.map(field => field.toBytes(tx[field.name]))
+  ),
+  fromBytes: (bytes: Uint8Array, start = 0) => {
+    const allFields = headerSchema.concat(fields)
+  }
 })
 
 const txFields = {
@@ -159,21 +169,22 @@ const txFields = {
   type: {
     name: 'type',
     toBytes: BYTE,
-    fromBytes: byteToNumber
+    fromBytes: byteToNumber(1)
   },
   version: {
     name: 'version',
     toBytes: BYTE,
-    fromBytes: byteToNumber
+    fromBytes: byteToNumber(1)
   }
 }
 
-const header = [
+
+const headerSchema: IFieldProcessor<any>[] = [
   txFields.type,
   txFields.version
 ];
 
-const proofs = [];
+const proofsSchema: IFieldProcessor<any>[] = [];
 
 const aliasSchemaV2 = [
   txFields.senderPublicKey,
@@ -318,5 +329,42 @@ export const schemasByTypeMap = {
   [TRANSACTION_TYPE.SET_ASSET_SCRIPT]: {
     1: setAssetScriptSchemaV1
   }
+};
+
+interface IFieldProcessor<T> {
+  name: string;
+  toBytes: TSerializer<T>;
+  fromBytes: TParser<T>;
 }
 
+export interface ILongFactory<LONG> {
+  fromString(value: string): LONG;
+  toString(value: LONG): string
+}
+
+export const serializerFromSchema = <T, R extends IFieldProcessor<T>, LONG = string | number>(bodySchema: R[], lf?: ILongFactory<LONG>) => (tx: any) => concat(
+  ...headerSchema.map(field => field.toBytes(tx[field.name])),
+  // Compiler thinks that toBytes newer equals LONG based on types
+  ...bodySchema.map(field => field.toBytes === <any>LONG && lf ? field.toBytes(lf.toString(tx[field.name]) as any) : field.toBytes(tx[field.name])),
+  ...proofsSchema.map(field => field.toBytes(tx[field.name])),
+);
+
+export const parserFromSchema = <T, R extends IFieldProcessor<T>, LONG = string>(bodySchema: R, lf?: ILongFactory<LONG>) => (bytes: Uint8Array) => {
+  const allFields = headerSchema.concat(bodySchema).concat(proofsSchema);
+  let cursor = 0;
+  let result: any = {};
+
+  allFields.forEach(({name, fromBytes}) => {
+    const {value, shift} = fromBytes(bytes, cursor);
+    cursor += shift;
+    if (value !== undefined) {
+      if (value instanceof Long) {
+        result[name] = lf ? lf.fromString(value.toString()) : value.toString()
+      } else {
+        result[name] = value
+      }
+    }
+  });
+
+  return result
+};
