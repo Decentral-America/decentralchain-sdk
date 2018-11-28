@@ -16,9 +16,9 @@ import {
   byteToBase58, P_BOOLEAN, byteToData,
   byteToScript,
   byteToStringWithLength, byteToTransfers,
- P_LONG, P_OPTION, P_SHORT, TParser, P_BYTE
+  P_LONG, P_OPTION, P_SHORT, TParser, P_BYTE
 } from './parsePrimitives'
-import {concat} from './libs/utils'
+import {concat, range} from './libs/utils'
 
 //Todo: import this enum from ts-types package
 export enum TRANSACTION_TYPE {
@@ -39,6 +39,29 @@ export enum TRANSACTION_TYPE {
   SET_ASSET_SCRIPT = 15,
 }
 
+type TSchema = TObject | TArray | TAnyof | TPrimitive
+type TObject = {
+  name: string;
+  type: 'object';
+  schema: TSchema[];
+}
+type TArray = {
+  name: string;
+  type: 'array';
+  items: TSchema
+}
+type TAnyof = {
+  name: string;
+  type: 'anyof';
+  items: TSchema[];
+}
+type TPrimitive = {
+  name: string;
+  type: 'primitive';
+  toBytes: (...args: any) => any;
+  fromBytes: (...args: any) => any;
+}
+
 const typeMap: any = {
   integer: ['integer', 0, LONG],
   number: ['integer', 0, LONG],
@@ -56,126 +79,142 @@ export const parseHeader = (bytes: Uint8Array): { type: number, version: number 
 
 const createProcessor = <T, R extends IFieldProcessor<T>>(fields: R[]) => ({
   toBytes: (tx: any) => concat(
-    ...fields.map(field => field.toBytes(tx[field.name]))
+    ...fields.map(field => field.toBytes!(tx[field.name]))
   ),
   fromBytes: (bytes: Uint8Array, start = 0) => {
     const allFields = headerSchema.concat(fields)
   }
 })
 
-const txFields: Record<string, IFieldProcessor<any>> = {
-  alias: {
+export namespace txFields {
+  export const alias = {
     name: 'alias',
     toBytes: LEN(SHORT)(STRING),
     fromBytes: byteNewAliasToString
-  },
-  amount: {
+  };
+  export const amount = {
     name: 'amount',
     toBytes: LONG,
     fromBytes: P_LONG
-  },
-  assetDescription: {
+  }
+  export const assetDescription = {
     name: 'description',
     toBytes: LEN(SHORT)(STRING),
     fromBytes: byteToStringWithLength
-  },
-  assetId: {
+  }
+  export const assetId = {
     name: 'assetId',
     toBytes: BASE58_STRING,
     fromBytes: byteToBase58
-  },
-  assetName: {
+  }
+  export const assetName = {
     name: 'name',
     toBytes: LEN(SHORT)(STRING),
     fromBytes: byteToStringWithLength
-  },
-  attachment: {
+  }
+  export const attachment = {
     name: 'attachment',
     toBytes: LEN(SHORT)(STRING),
     fromBytes: byteToStringWithLength
-  },
-  chainId: {
+  }
+  export const chainId = {
     name: 'chainId',
     toBytes: BYTE,
     fromBytes: P_BYTE
-  },
-  data: {
+  }
+  export const data = {
     name: 'data',
     //Todo: Rewrite,using only node data types
     toBytes: COUNT(SHORT)((x: any) => concat(LEN(SHORT)(STRING)(x.key), [typeMap[x.type][1]], typeMap[x.type][2](x.value))),
     fromBytes: byteToData
-  },
-  decimals: {
+  }
+  export const decimals = {
     name: 'decimals',
     toBytes: BYTE,
     fromBytes: P_BYTE,
-  },
-  fee: {
+  }
+  export const fee = {
     name: 'fee',
     toBytes: LONG,
     fromBytes: P_LONG
-  },
-  leaseAssetId: {
+  }
+  export const leaseAssetId = {
     name: 'leaseAssetId',
     toBytes: OPTION(BASE58_STRING),
     fromBytes: P_OPTION(byteToBase58)
-  },
-  leaseId: {
+  }
+  export const leaseId = {
     name: 'leaseId',
     toBytes: BASE58_STRING,
     fromBytes: byteToBase58
-  },
-  optionalAssetId: {
+  }
+  export const optionalAssetId = {
     name: 'assetId',
     toBytes: OPTION(BASE58_STRING),
     fromBytes: P_OPTION(byteToBase58)
-  },
-  quantity: {
+  }
+  export const quantity = {
     name: 'quantity',
     toBytes: LONG,
     fromBytes: P_LONG
-  },
-  reissuable: {
+  }
+  export const reissuable = {
     name: 'reissuable',
     toBytes: BOOL,
     fromBytes: P_BOOLEAN
-  },
-  recipient: {
+  }
+  export const recipient = {
     name: 'recipient',
     toBytes: BASE58_STRING,
     fromBytes: byteToAddressOrAlias
-  },
-  script: {
+  }
+  export const script = {
     name: 'script',
     toBytes: SCRIPT,
     fromBytes: byteToScript
-  },
-  senderPublicKey: {
+  }
+  export const senderPublicKey = {
     name: 'senderPublicKey',
     toBytes: BASE58_STRING,
     fromBytes: byteToBase58,
-  },
-  timestamp: {
+  }
+
+  export const timestamp = {
     name: 'timestamp',
     toBytes: LONG,
     fromBytes: P_LONG
-  },
-  transfers: {
+  }
+
+  export const transfer = {
+    name: 'transfer',
+    schema: [
+      recipient,
+      amount
+    ]
+  }
+
+  export const transfers = {
     name: 'transfers',
-    toBytes: COUNT(SHORT)((x: any) => concat(BASE58_STRING(x.recipient), LONG(x.amount))),
-    fromBytes: byteToTransfers
-  },
-  type: {
+    items: transfer
+    // toBytes: COUNT(SHORT)((x: any) => concat(BASE58_STRING(x.recipient), LONG(x.amount))),
+    // fromBytes: byteToTransfers
+  }
+  export const type = {
     name: 'type',
     toBytes: BYTE,
     fromBytes: P_BYTE
-  },
-  version: {
+  }
+  export const version = {
     name: 'version',
     toBytes: BYTE,
     fromBytes: P_BYTE
   }
+
+
 }
+// const txFields = {
+//
+// }
 
 
 const headerSchema: IFieldProcessor<any>[] = [
@@ -185,29 +224,44 @@ const headerSchema: IFieldProcessor<any>[] = [
 
 const proofsSchema: IFieldProcessor<any>[] = [];
 
-const aliasSchemaV2 = [
-  txFields.senderPublicKey,
-  txFields.alias,
-  txFields.timestamp,
-  txFields.fee
-];
+const aliasSchemaV2 = {
+  name: 'aliasSchemaV2',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.senderPublicKey,
+    txFields.alias,
+    txFields.timestamp,
+    txFields.fee
+  ]
+};
 
-const burnSchemaV2 = [
-  txFields.chainId,
-  txFields.senderPublicKey,
-  txFields.assetId,
-  txFields.quantity,
-  txFields.fee,
-  txFields.timestamp
-];
+const burnSchemaV2 = {
+  name: 'burnSchemaV2',
+  type: 'object',
+  schema:[
+    txFields.type,
+    txFields.version,
+    txFields.chainId,
+    txFields.senderPublicKey,
+    txFields.assetId,
+    txFields.quantity,
+    txFields.fee,
+    txFields.timestamp
+  ]
+};
 
-const cancelLeaseSchemaV2 = [
+const cancelLeaseSchemaV2 = {
+  name: 'cancelLeaseSchemaV2',
+
+  schema:[
   txFields.chainId,
   txFields.senderPublicKey,
   txFields.fee,
   txFields.timestamp,
   txFields.leaseId
-];
+]};
 
 const dataSchemaV1 = [
   txFields.senderPublicKey,
@@ -332,11 +386,16 @@ export const schemasByTypeMap = {
 
 interface IFieldProcessor<T> {
   name: string;
-  toBytes: TSerializer<T>;
-  fromBytes: TParser<T>;
+  array?: boolean
+  schema?: IFieldProcessor<any>[]
+  toBytes?: TSerializer<T>;
+  fromBytes?: TParser<T>;
 }
+
+
 export interface ILongFactory<LONG> {
   fromString(value: string): LONG;
+
   toString(value: LONG): string
 }
 
@@ -345,22 +404,33 @@ export const defaultLongFactory: ILongFactory<string | number> = {
   toString: v => v.toString()
 }
 
-export const serializerFromSchema = <T, R extends IFieldProcessor<T>, LONG = string | number>(bodySchema: R[], lf?: ILongFactory<LONG>) => (tx: any) => concat(
-  ...headerSchema.map(field => field.toBytes(tx[field.name])),
-  // Compiler thinks that toBytes newer equals LONG based on types
-  ...bodySchema.map(field => field.toBytes === <any>LONG && lf ? field.toBytes(lf.toString(tx[field.name]) as any) : field.toBytes(tx[field.name])),
-  ...proofsSchema.map(field => field.toBytes(tx[field.name])),
-);
+// export const serializerFromSchema = <T, R extends IFieldProcessor<T>, LONG = string | number>(bodySchema: R[], lf?: ILongFactory<LONG>) => (tx: any) => concat(
+//   ...headerSchema.map(field => field.toBytes(tx[field.name])),
+//   // Compiler thinks that toBytes newer equals LONG based on types
+//   ...bodySchema.map(field => field.toBytes === <any>LONG && lf ? field.toBytes(lf.toString(tx[field.name]) as any) : field.toBytes(tx[field.name])),
+//   ...proofsSchema.map(field => field.toBytes(tx[field.name])),
+// );
 
-// export const serializerFromSchema = <T, R extends IFieldProcessor<T>, LONG = string | number>(bodySchema: R[], lf?: ILongFactory<LONG>) => (tx: any) =>{
-//   const allFields = headerSchema.concat(bodySchema).concat(proofsSchema);
-//   let result = Uint8Array.from([])
-//   allFields.forEach(({name, toBytes}) => {
-//     const value = toBytes(tx[name]);
-//     result = concat(result, value)
-//   })
-//   return result
-// };
+export const serializerFromSchema = <T, R extends IFieldProcessor<T>, LONG = string | number>(bodySchema: R[], lf?: ILongFactory<LONG>) => (tx: any) =>{
+  const allFields = headerSchema.concat(bodySchema).concat(proofsSchema);
+  let result = Uint8Array.from([])
+  allFields.forEach(({name, array, schema, toBytes}) => {
+    if (array){
+      const items = tx[name]
+      const itemsLen = items.length
+      const itemsBytes = items.map((item:any) => toBytes!(item))
+      result = concat(result, SHORT(itemsLen), ...itemsBytes)
+    }else {
+      if (schema){
+        result = concat(result, serializerFromSchema(schema)(tx[name]))
+      }else {
+        const value = toBytes!(tx[name]);
+        result = concat(result, value)
+      }
+    }
+  })
+  return result
+};
 
 //export const concatParsers = (parsers:TParser<any>[]) => (bytes: Uint8Array)
 
@@ -369,16 +439,34 @@ export const parserFromSchema = <T, R extends IFieldProcessor<T>, LONG = string>
   let cursor = 0;
   let result: any = {};
 
-  allFields.forEach(({name, fromBytes}) => {
-    const {value, shift} = fromBytes(bytes, cursor);
-    cursor += shift;
-    if (value !== undefined) {
-      if (value instanceof Long) {
-        result[name] = lf ? lf.fromString(value.toString()) : value.toString()
-      } else {
-        result[name] = value
+  allFields.forEach(({name, array, schema, fromBytes}) => {
+    if(array){
+      let arr: any = []
+      const {value: len, shift} = P_SHORT(bytes, cursor)
+      cursor+=shift
+
+      range(0, len).forEach(_ => {
+        const {value, shift} = fromBytes!(bytes, cursor)
+        arr.push(value);
+        cursor += shift;
+      })
+      result[name] = arr
+    }else {
+      if (schema){
+        //result[name] = parserFromSchema(schema)(bytes)
+      }else {
+        const {value, shift} = fromBytes!(bytes, cursor);
+        cursor += shift;
+        if (value !== undefined) {
+          if (value instanceof Long) {
+            result[name] = lf ? lf.fromString(value.toString()) : value.toString()
+          } else {
+            result[name] = value
+          }
+        }
       }
     }
+
   });
 
   return result
