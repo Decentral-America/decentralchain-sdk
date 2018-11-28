@@ -70,7 +70,7 @@ describe('Tx serialize/parse', ()=> {
   Object.entries(exampleTxs).forEach(([type, tx]) => {
     it(`Type: ${type}`, () => {
       const bytes = serialize(tx)
-      const parsed = parse<number>(bytes, {toString: (x)=>x.toString(),fromString:(x)=>parseInt(x) })
+      const parsed = parse<number>(bytes, {toString: (x)=>String(x),fromString:(x)=>parseInt(x)})
       expect(tx).toMatchObject(parsed)
     })
   });

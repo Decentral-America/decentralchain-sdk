@@ -69,17 +69,6 @@ export const byteToBase58 = (bytes: Uint8Array, start: number = 0, length?: numb
   return {value, shift};
 };
 
-// export const byteToAssetId = (bytes: Uint8Array, start: number) => {
-//   const shift = 33;
-//   //Todo what if assetId starts with 0 byte?
-//   const isWaves = !bytes[start];
-//   if (isWaves) {
-//     return {shift: 1, value: 'WAVES'};
-//   }
-//   const {value} = byteToBase58(bytes, start + 1);
-//   return {shift, value};
-// };
-
 export const byteToAddressOrAlias = (bytes: Uint8Array, start: number = 0) => {
   if (bytes[start] === ALIAS_VERSION) {
     const aliasData = byteToStringWithLength(bytes, start + 2);

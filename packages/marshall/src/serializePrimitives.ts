@@ -59,7 +59,7 @@ export const LONG: TSerializer<number | string> = (value: number | string) => {
     }
     l = Long.fromNumber(value, true)
   } else {
-    l = Long.fromString(value, true)
+    l = Long.fromString(value.toString(), true)
   }
   return Uint8Array.from(l.toBytesBE())
 }
