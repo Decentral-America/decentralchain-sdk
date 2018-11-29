@@ -39,7 +39,14 @@ export enum TRANSACTION_TYPE {
   SET_ASSET_SCRIPT = 15,
 }
 
-type TSchema = TObject | TArray | TAnyof | TPrimitive
+export enum DATA_FIELD_TYPE {
+  INTEGER = 'integer',
+  BOOLEAN = 'boolean',
+  STRING = 'string',
+  BINARY = 'binary'
+}
+
+type TSchema = TObject | TArray | TAnyOf | TPrimitive
 type TObject = {
   name: string;
   type: 'object';
@@ -50,17 +57,22 @@ type TArray = {
   type: 'array';
   items: TSchema
 }
-type TAnyof = {
+type TAnyOf = {
   name: string;
-  type: 'anyof';
-  items: TSchema[];
+  type: 'anyOf';
+  discriminant: string;
+  items: Map<string, TObject | TAnyOf>;
 }
 type TPrimitive = {
   name: string;
-  type: 'primitive';
+  type: 'primitive' | undefined;
   toBytes: (...args: any) => any;
   fromBytes: (...args: any) => any;
 }
+type WithName = {
+  name: string
+}
+
 
 const typeMap: any = {
   integer: ['integer', 0, LONG],
@@ -76,15 +88,6 @@ export const parseHeader = (bytes: Uint8Array): { type: number, version: number 
   version: P_BYTE(bytes, 1).value
 })
 
-
-const createProcessor = <T, R extends IFieldProcessor<T>>(fields: R[]) => ({
-  toBytes: (tx: any) => concat(
-    ...fields.map(field => field.toBytes!(tx[field.name]))
-  ),
-  fromBytes: (bytes: Uint8Array, start = 0) => {
-    const allFields = headerSchema.concat(fields)
-  }
-})
 
 export namespace txFields {
   export const alias = {
@@ -187,6 +190,7 @@ export namespace txFields {
 
   export const transfer = {
     name: 'transfer',
+    type: 'object',
     schema: [
       recipient,
       amount
@@ -195,10 +199,10 @@ export namespace txFields {
 
   export const transfers = {
     name: 'transfers',
+    type: 'array',
     items: transfer
-    // toBytes: COUNT(SHORT)((x: any) => concat(BASE58_STRING(x.recipient), LONG(x.amount))),
-    // fromBytes: byteToTransfers
   }
+
   export const type = {
     name: 'type',
     toBytes: BYTE,
@@ -215,12 +219,6 @@ export namespace txFields {
 // const txFields = {
 //
 // }
-
-
-const headerSchema: IFieldProcessor<any>[] = [
-  txFields.type,
-  txFields.version
-];
 
 const proofsSchema: IFieldProcessor<any>[] = [];
 
@@ -240,7 +238,7 @@ const aliasSchemaV2 = {
 const burnSchemaV2 = {
   name: 'burnSchemaV2',
   type: 'object',
-  schema:[
+  schema: [
     txFields.type,
     txFields.version,
     txFields.chainId,
@@ -254,90 +252,141 @@ const burnSchemaV2 = {
 
 const cancelLeaseSchemaV2 = {
   name: 'cancelLeaseSchemaV2',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.chainId,
+    txFields.senderPublicKey,
+    txFields.fee,
+    txFields.timestamp,
+    txFields.leaseId
+  ]
+};
 
-  schema:[
-  txFields.chainId,
-  txFields.senderPublicKey,
-  txFields.fee,
-  txFields.timestamp,
-  txFields.leaseId
-]};
+const dataSchemaV1 = {
+  name: 'dataSchemaV1',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.senderPublicKey,
+    txFields.data,
+    txFields.timestamp,
+    txFields.fee
+  ]
+};
 
-const dataSchemaV1 = [
-  txFields.senderPublicKey,
-  txFields.data,
-  txFields.timestamp,
-  txFields.fee
-];
+const issueSchemaV2 = {
+  name: 'issueSchemaV2',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.chainId,
+    txFields.senderPublicKey,
+    txFields.assetName,
+    txFields.assetDescription,
+    txFields.quantity,
+    txFields.decimals,
+    txFields.reissuable,
+    txFields.fee,
+    txFields.timestamp,
+    txFields.script
+  ]
+};
 
-const issueSchemaV2 = [
-  txFields.chainId,
-  txFields.senderPublicKey,
-  txFields.assetName,
-  txFields.assetDescription,
-  txFields.quantity,
-  txFields.decimals,
-  txFields.reissuable,
-  txFields.fee,
-  txFields.timestamp,
-  txFields.script
-];
+const leaseSchemaV2 = {
+  name: 'issueSchemaV2',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.leaseAssetId,
+    txFields.senderPublicKey,
+    txFields.recipient,
+    txFields.amount,
+    txFields.fee,
+    txFields.timestamp
+  ]
+};
 
-const leaseSchemaV2 = [
-  txFields.leaseAssetId,
-  txFields.senderPublicKey,
-  txFields.recipient,
-  txFields.amount,
-  txFields.fee,
-  txFields.timestamp
-];
+const massTransferSchemaV1 = {
+  name: 'massTransferSchemaV1',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.senderPublicKey,
+    txFields.optionalAssetId,
+    txFields.transfers,
+    txFields.timestamp,
+    txFields.fee,
+    txFields.attachment
+  ]
+};
 
-const massTransferSchemaV1 = [
-  txFields.senderPublicKey,
-  txFields.optionalAssetId,
-  txFields.transfers,
-  txFields.timestamp,
-  txFields.fee,
-  txFields.attachment
-];
+const reissueSchemaV2 = {
+  name: 'reissueSchemaV2',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.chainId,
+    txFields.senderPublicKey,
+    txFields.assetId,
+    txFields.quantity,
+    txFields.reissuable,
+    txFields.fee,
+    txFields.timestamp,
+  ]
+};
 
-const reissueSchemaV2 = [
-  txFields.chainId,
-  txFields.senderPublicKey,
-  txFields.assetId,
-  txFields.quantity,
-  txFields.reissuable,
-  txFields.fee,
-  txFields.timestamp,
-];
+const setAssetScriptSchemaV1 = {
+  name: 'setAssetScriptSchemaV1',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.chainId,
+    txFields.senderPublicKey,
+    txFields.assetId,
+    txFields.fee,
+    txFields.timestamp,
+    txFields.script
+  ]
+};
 
-const setAssetScriptSchemaV1 = [
-  txFields.chainId,
-  txFields.senderPublicKey,
-  txFields.assetId,
-  txFields.fee,
-  txFields.timestamp,
-  txFields.script
-];
+const setScriptSchemaV1 = {
+  name: 'setScriptSchemaV1',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.chainId,
+    txFields.senderPublicKey,
+    txFields.script,
+    txFields.fee,
+    txFields.timestamp
+  ]
+};
 
-const setScriptSchemaV1 = [
-  txFields.chainId,
-  txFields.senderPublicKey,
-  txFields.script,
-  txFields.fee,
-  txFields.timestamp
-];
-
-const transferSchemaV2 = [
-  txFields.senderPublicKey,
-  txFields.optionalAssetId,
-  {...txFields.optionalAssetId, name: 'feeAssetId'},
-  txFields.timestamp,
-  txFields.amount,
-  txFields.fee,
-  txFields.recipient,
-  txFields.attachment
-];
+const transferSchemaV2 = {
+  name: 'transferSchemaV2',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.senderPublicKey,
+    txFields.optionalAssetId,
+    {...txFields.optionalAssetId, name: 'feeAssetId'},
+    txFields.timestamp,
+    txFields.amount,
+    txFields.fee,
+    txFields.recipient,
+    txFields.attachment
+  ]
+};
 
 const OrderSchema = []
 
@@ -411,63 +460,93 @@ export const defaultLongFactory: ILongFactory<string | number> = {
 //   ...proofsSchema.map(field => field.toBytes(tx[field.name])),
 // );
 
-export const serializerFromSchema = <T, R extends IFieldProcessor<T>, LONG = string | number>(bodySchema: R[], lf?: ILongFactory<LONG>) => (tx: any) =>{
-  const allFields = headerSchema.concat(bodySchema).concat(proofsSchema);
-  let result = Uint8Array.from([])
-  allFields.forEach(({name, array, schema, toBytes}) => {
-    if (array){
-      const items = tx[name]
-      const itemsLen = items.length
-      const itemsBytes = items.map((item:any) => toBytes!(item))
-      result = concat(result, SHORT(itemsLen), ...itemsBytes)
-    }else {
-      if (schema){
-        result = concat(result, serializerFromSchema(schema)(tx[name]))
-      }else {
-        const value = toBytes!(tx[name]);
-        result = concat(result, value)
-      }
+export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf?: ILongFactory<LONG>): TSerializer<any> => (obj: any) => {
+  let result = Uint8Array.from([]);
+
+  let serializer: TSerializer<any>,
+    itemBytes: Uint8Array;
+
+  if (schema.type === 'array') {
+    serializer = serializerFromSchema(schema.items, lf);
+    itemBytes = concat(...obj.map((item: any) => serializer((item))));
+    result = concat(result, SHORT(obj.length), itemBytes);
+  } else if (schema.type === 'object') {
+    schema.schema.forEach(field => {
+      serializer = serializerFromSchema(field, lf);
+      itemBytes = serializer(obj[field.name]);
+      result = concat(result, itemBytes);
+    });
+  } else if (schema.type === 'anyOf') {
+    const item = obj[schema.name];
+    const type = item[schema.discriminant];
+    const typeSchema = schema.items.get(type);
+    if (typeSchema == null) {
+      throw new Error(`Serializer Error: Unknown anyOf type: ${schema.discriminant}.${type}`)
     }
-  })
+    serializer = serializerFromSchema(typeSchema, lf);
+    itemBytes = serializer(item);
+    result = concat(result, itemBytes);
+  } else if (schema.type === 'primitive' || schema.type === undefined) {
+    result = concat(result, schema.toBytes(obj));
+  } else {
+    throw new Error(`Serializer Error: Unknown schema type: ${schema!.type}`)
+  }
+
   return result
 };
 
 //export const concatParsers = (parsers:TParser<any>[]) => (bytes: Uint8Array)
 
-export const parserFromSchema = <T, R extends IFieldProcessor<T>, LONG = string>(bodySchema: R, lf?: ILongFactory<LONG>) => (bytes: Uint8Array) => {
-  const allFields = headerSchema.concat(bodySchema).concat(proofsSchema);
-  let cursor = 0;
-  let result: any = {};
+export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFactory<LONG>): TParser<any> => (bytes: Uint8Array, start = 0) => {
+  let cursor: number = start;
 
-  allFields.forEach(({name, array, schema, fromBytes}) => {
-    if(array){
-      let arr: any = []
-      const {value: len, shift} = P_SHORT(bytes, cursor)
-      cursor+=shift
+  if (schema.type === 'array') {
+    const result: any[] = [];
+    const {value: len, shift} = P_SHORT(bytes, start);
+    cursor += shift;
 
-      range(0, len).forEach(_ => {
-        const {value, shift} = fromBytes!(bytes, cursor)
-        arr.push(value);
-        cursor += shift;
-      })
-      result[name] = arr
-    }else {
-      if (schema){
-        //result[name] = parserFromSchema(schema)(bytes)
-      }else {
-        const {value, shift} = fromBytes!(bytes, cursor);
-        cursor += shift;
-        if (value !== undefined) {
-          if (value instanceof Long) {
-            result[name] = lf ? lf.fromString(value.toString()) : value.toString()
-          } else {
-            result[name] = value
-          }
-        }
+    range(0, len).forEach(_ => {
+      const parser = parserFromSchema(schema.items, lf);
+      const {value, shift} = parser(bytes, cursor);
+      result.push(value);
+      cursor = shift;
+    });
+
+    return {value: result, shift: cursor}
+  }
+  else if (schema.type === 'object') {
+    const result: any = {};
+    schema.schema.forEach(field => {
+      const parser = parserFromSchema(field, lf);
+      const {value, shift} = parser(bytes, cursor);
+      cursor = shift;
+      if (value !== undefined){
+        result[field.name] = value
       }
+    });
+
+    return {value: result, shift: cursor}
+  }
+  else if (schema.type === 'anyOf') {
+    let {value: anyOfIndex, shift} = P_BYTE(bytes, cursor);
+    cursor += shift;
+    const item = Array.from(schema.items.values())[anyOfIndex];
+    const parser = parserFromSchema(item, lf);
+    const result = parser(bytes, cursor);
+    cursor += result.shift;
+    return result
+  } else if (schema.type === 'primitive' || schema.type === undefined) {
+    const parser = schema.fromBytes;
+    let {value, shift} = parser(bytes, start);
+
+    //Capture LONG Parser and convert strings desired instance if longFactory is present
+    if (parser === P_LONG && lf){
+      value = lf.fromString(value)
     }
-
-  });
-
-  return result
+    return {value, shift: start + shift}
+  } else {
+    throw new Error(`Parser Error: Unknown schema type: ${schema!.type}`)
+  }
 };
+
+

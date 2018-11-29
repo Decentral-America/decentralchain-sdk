@@ -11,7 +11,7 @@ export function parse<LONG = string>(bytes: Uint8Array, longFactory?: ILongFacto
   const {type, version} = parseHeader(bytes);
   const schema = getSchema(type, version);
 
-  return parserFromSchema(schema, longFactory)(bytes);
+  return parserFromSchema(schema, longFactory)(bytes).value;
 }
 
 function getSchema(type: number, version?: number) {

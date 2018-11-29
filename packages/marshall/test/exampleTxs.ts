@@ -107,9 +107,11 @@ export const massTransferTx = {
   proofs:
     ['2Un2WpTiFBdhhh7nXd99ci3gAqonuz4xBkWrDS1MJ5fUo9AW12aiYXi3KvnRrmt3C7HqE3BrokzAnYAckd3ggu7D'],
   id: '7mEAv8DgVgo9xgg4nSMNBeFjuKUsnnqanQgqFw2VEKmG',
-  transfers:
-    [{recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000},
-      {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000}]
+  transfers: [
+    {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000},
+    {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000}
+  ],
+  attachment: ''
 }
 
 export const dataTx = {
@@ -121,10 +123,12 @@ export const dataTx = {
   proofs:
     ['5AMn7DEwZ6VvDLkJNdP5EW1PPJQKeWjy8qp5HoCGWaWWEPYdr1Ewkqor6NfLPDrGQdHd5DFUoE7CtwSrfAUMKLAY'],
   id: 'F7fkrYuJAsJfJRucwty7dcBoMS95xBufxBi7AXqCFgXg',
-  data:
-    [{type: 'binary', key: 'someparam', value: 'base64:AQIDBA=='},
-      {key: 'someparam2', type: 'binary', value: 'base64:YXNkYQ=='},
-      {type: 'boolean', key: 'someparam3', value: true}]
+  data: [
+    {type: 'binary', key: 'someparam', value: 'base64:AQIDBA=='},
+    {key: 'someparam2', type: 'binary', value: 'base64:YXNkYQ=='},
+    {type: 'boolean', key: 'someparam3', value: true},
+    {type: 'integer', key: 'integerParam', value: 1000}
+  ]
 }
 
 export const setScriptTx = {
