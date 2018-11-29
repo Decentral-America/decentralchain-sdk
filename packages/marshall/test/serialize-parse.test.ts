@@ -13,6 +13,14 @@ describe('Tx serialize/parse', ()=> {
     })
   });
 
+
+  it('Should correctly serialize LONGjs', ()=>{
+    const tx: any = exampleTxs[12];
+    const bytes = serialize({...tx, fee: Long.fromNumber(tx.fee)});
+    const parsed = parse<number>(bytes, {toString: (x)=>String(x),fromString:(x)=>parseInt(x)});
+    expect(tx).toMatchObject(parsed)
+  });
+
   it('Should convert LONGjs', ()=>{
     const tx = exampleTxs[12];
     const bytes = serialize(tx);
