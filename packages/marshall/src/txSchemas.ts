@@ -16,7 +16,7 @@ import {
   P_LONG, P_OPTION, P_BYTE
 } from './parsePrimitives'
 
-//Todo: import this enum from ts-types package
+//Todo: import this enums from ts-types package
 export enum TRANSACTION_TYPE {
   GENESIS = 1,
   PAYMENT = 2,
@@ -66,7 +66,7 @@ export type TPrimitive = {
   name: string;
   type?: 'primitive';
   toBytes: (...args: any) => any;
-  fromBytes: (bytes: Uint8Array) => any;
+  fromBytes: (bytes: Uint8Array, start?: number) => any;
 }
 
 //Data tx field serializes differently. It has type AFTER key field!!!
