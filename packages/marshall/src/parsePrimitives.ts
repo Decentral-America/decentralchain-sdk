@@ -47,6 +47,15 @@ export const P_LONG: TParser<string> =  (bytes, start = 0) => ({
   shift: 8
 });
 
+export const P_LEN = <T>(lenParser: TParser<number>) => (parser: TParser<T>): TParser<T> => (bytes: Uint8Array, start = 0) => {
+  const lenInfo = lenParser(bytes, start);
+  const {value, shift} = parser(bytes.slice(start + lenInfo.shift, start + lenInfo.shift + lenInfo.value));
+  return {
+    value,
+    shift: start + lenInfo.shift + shift
+  }
+};
+
 export const P_BOOLEAN = (bytes: Uint8Array, start: number = 0) => {
   const value = !!bytes[start];
   return {value, shift: 1};

@@ -10,7 +10,6 @@ export const issueTx = {
   proofs:
     ['TVMCuJAb52AqLZnJHsZoWhjmULk27hzbzy7n3LsrwivdsCQ6gQpn8TtVwYuYhAZVcCLkbm4yznGCgrV96spafcp'],
   id: '3TZ1AWMeVskdy96rNo9AiyegimGyDyXr55MbDTQX4ZXM',
-  assetId: 'test',
   quantity: 10000,
   name: 'test',
   description: 'tratata',
@@ -111,7 +110,7 @@ export const massTransferTx = {
     {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000},
     {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000}
   ],
-  attachment: ''
+  attachment: 'aAaABbbBB43Cc'
 }
 
 export const dataTx = {
@@ -125,7 +124,7 @@ export const dataTx = {
   id: 'F7fkrYuJAsJfJRucwty7dcBoMS95xBufxBi7AXqCFgXg',
   data: [
     {type: 'binary', key: 'aspen', value: 'base64:AQIDBA=='},
-    {type: 'binary',key:'brittany', value: 'base64:YXNkYQ=='},
+    {type: 'binary', key: 'brittany', value: 'base64:YXNkYQ=='},
     {type: 'boolean', key: 'charlie', value: true},
     {type: 'integer', key: 'douglas', value: 1000}
   ]
@@ -142,6 +141,19 @@ export const setScriptTx = {
     ['35x1Rphm1mr24ELJgpLP6dK3wMW7cG6nWsFUcMF3RvxKr3UjEuo4NfYnQf6MEanD7bxBdKDuYxbBJZYQQ495ax3w'],
   id: 'J8SBGZzSLybdsgpFjDNxVwB8mixkZoEJkgHya3EiXXPc',
   script: 'base64:AQa3b8tH'
+}
+
+export const sponsorshipTx = {
+  type: 14,
+  id: "CwHecsEjYemKR7wqRkgkZxGrb5UEfD8yvZpFF5wXm2Su",
+  assetId: "A8c7MKNWJwbGmoVnuXd8aiDH9xLXxa8jLvzjx6syXGYf",
+  sender: "3FjTpAg1VbmxSH39YWnfFukAUhxMqmKqTEZ",
+  senderPublicKey: "5AzfA9UfpWVYiwFwvdr77k6LWupSTGLb14b24oVdEpMM",
+  minSponsoredAssetFee: 100000, // minimum amount of assets require for fee, set equal to null to cancel sponsorship
+  fee: 100000000,
+  timestamp: 1520945679531,
+  proofs: ["4huvVwtbALH9W2RQSF5h1XG6PFYLA6nvcAEgv79nVLW7myCysWST6t4wsCqhLCSGoc5zeLxG6MEHpcnB6DPy3XWr"],
+  version: 1,
 }
 
 export const setAssetScriptTx = {
@@ -169,6 +181,7 @@ export const exampleTxs = {
   11: massTransferTx,
   12: dataTx,
   13: setScriptTx,
+  14: sponsorshipTx,
   15: setAssetScriptTx
 }
   

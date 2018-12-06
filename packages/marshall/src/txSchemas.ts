@@ -13,7 +13,7 @@ import {
   byteToBase58, P_BOOLEAN,
   byteToScript,
   byteToStringWithLength,
-  P_LONG, P_OPTION, P_BYTE
+  P_LONG, P_OPTION, P_BYTE, P_LEN, P_SHORT
 } from './parsePrimitives'
 
 //Todo: import this enums from ts-types package
@@ -104,6 +104,7 @@ export namespace txFields {
     fromBytes: byteToStringWithLength
   });
 
+
   // Primitive fields
   export const alias = {
     name: 'alias',
@@ -121,7 +122,11 @@ export namespace txFields {
   };
   export const assetName = stringField('name');
 
-  export const attachment = stringField('attachment');
+  export const attachment = {
+    name: 'attachment',
+    toBytes: LEN(SHORT)(BASE58_STRING),
+    fromBytes: P_LEN(P_SHORT)(byteToBase58)
+  }
 
   export const chainId = byteField('chainId');
 
@@ -353,6 +358,18 @@ const setScriptSchemaV1 = {
   ]
 };
 
+const sponsorshipV1 = {
+  name: 'sponsorshipV1',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.assetId,
+    txFields.longField('minSponsoredAssetFee'),
+    txFields.fee,
+    txFields.timestamp
+  ]
+}
 const transferSchemaV2 = {
   name: 'transferSchemaV2',
   type: 'object',
@@ -407,7 +424,9 @@ export const schemasByTypeMap = {
   [TRANSACTION_TYPE.SET_SCRIPT]: {
     1: setScriptSchemaV1
   },
-  [TRANSACTION_TYPE.SPONSORSHIP]: {},
+  [TRANSACTION_TYPE.SPONSORSHIP]: {
+    1: sponsorshipV1
+  },
   [TRANSACTION_TYPE.SET_ASSET_SCRIPT]: {
     1: setAssetScriptSchemaV1
   }
