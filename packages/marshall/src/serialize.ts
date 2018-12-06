@@ -1,4 +1,4 @@
-import {BYTE, SHORT, TSerializer} from "./serializePrimitives";
+import {BYTE, LEN, SHORT, TSerializer} from "./serializePrimitives";
 import {concat} from "./libs/utils";
 import {ILongFactory, TSchema, txFields} from "./txSchemas";
 
@@ -15,11 +15,14 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
     result = concat(result, SHORT(obj.length), itemBytes);
   }
   else if (schema.type === 'object') {
+    let objBytes = Uint8Array.from([])
     schema.schema.forEach(field => {
       serializer = serializerFromSchema(field, lf);
       itemBytes = serializer(obj[field.name]);
-      result = concat(result, itemBytes);
+      objBytes = concat(objBytes, itemBytes);
     });
+    if (schema.withLength) result = concat(result, SHORT(objBytes.length))
+    result = concat(result, objBytes)
   }
   else if (schema.type === 'anyOf') {
     const type = obj[schema.discriminant];

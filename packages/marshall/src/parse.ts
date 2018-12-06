@@ -20,6 +20,8 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     return {value: result, shift: cursor - start}
   }
   else if (schema.type === 'object') {
+    //we don't need object length to parse it since we have schema of all its fields
+    if(schema.withLength) cursor += 2;
     const result: any = {};
     schema.schema.forEach(field => {
       const parser = parserFromSchema(field, lf);
