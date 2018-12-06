@@ -3,14 +3,14 @@ import {serializerFromSchema} from "./serialize";
 import {parseHeader, parserFromSchema} from "./parse";
 import {txToJson} from "./txToJson";
 
-export function serialize<LONG = string | number>(tx: any, longFactory?: ILongFactory<LONG>): Uint8Array {
+export function serializeTx<LONG = string | number>(tx: any, longFactory?: ILongFactory<LONG>): Uint8Array {
   const {type, version} = tx;
   const schema = getSchema(type, version);
 
   return serializerFromSchema(schema, longFactory)(tx);
 }
 
-export function parse<LONG = string>(bytes: Uint8Array, longFactory?: ILongFactory<LONG>) {
+export function parseTx<LONG = string>(bytes: Uint8Array, longFactory?: ILongFactory<LONG>) {
   const {type, version} = parseHeader(bytes);
   const schema = getSchema(type, version);
 
@@ -32,7 +32,7 @@ export function stringify(tx: any): string {
 
 
 export function convert<T = string, R = string>(tx: any, toLf?: ILongFactory<T>, fromLf?: ILongFactory<R>) {
-  return parse(serialize(tx, fromLf), toLf)
+  return parseTx(serializeTx(tx, fromLf), toLf)
 }
 
 export function getSchema(type: number, version?: number) {

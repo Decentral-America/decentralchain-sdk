@@ -13,7 +13,7 @@ import {
   byteToBase58, P_BOOLEAN,
   byteToScript,
   byteToStringWithLength,
-  P_LONG, P_OPTION, P_BYTE, P_LEN, P_SHORT
+  P_LONG, P_OPTION, P_BYTE, P_SHORT, byteToBase58WithLength
 } from './parsePrimitives'
 
 //Todo: import this enums from ts-types package
@@ -104,6 +104,17 @@ export namespace txFields {
     fromBytes: byteToStringWithLength
   });
 
+  export const base58field = (name: string) => ({
+    name,
+    toBytes: BASE58_STRING,
+    fromBytes: byteToBase58
+  });
+
+  export const optionalBase58field = (name: string) => ({
+    name,
+    toBytes: OPTION(BASE58_STRING),
+    fromBytes: P_OPTION(byteToBase58)
+  });
 
   // Primitive fields
   export const alias = {
@@ -125,7 +136,7 @@ export namespace txFields {
   export const attachment = {
     name: 'attachment',
     toBytes: LEN(SHORT)(BASE58_STRING),
-    fromBytes: P_LEN(P_SHORT)(byteToBase58)
+    fromBytes: byteToBase58WithLength
   }
 
   export const chainId = byteField('chainId');
@@ -358,8 +369,8 @@ const setScriptSchemaV1 = {
   ]
 };
 
-const sponsorshipV1 = {
-  name: 'sponsorshipV1',
+const sponsorshipSchemaV1 = {
+  name: 'sponsorshipSchemaV1',
   type: 'object',
   schema: [
     txFields.type,
@@ -387,6 +398,34 @@ const transferSchemaV2 = {
   ]
 };
 
+export const orderSchemaV1: TObject = {
+  name: 'orderSchemav1',
+  type: 'object',
+  schema: [
+    txFields.senderPublicKey,
+    {...txFields.senderPublicKey, name: 'matcherPublicKey'},
+    {
+      name: 'assetPair',
+      type: 'object',
+      schema: [
+        txFields.optionalBase58field('amountAsset'),
+        txFields.optionalBase58field('priceAsset')
+      ]
+    },
+    {
+      name: 'orderType',
+      toBytes: (type: string) => BYTE(type === 'sell' ? 1 : 0),
+      fromBytes: (bytes: Uint8Array, start = 0) => P_BYTE(bytes, start).value === 1 ?
+        {value: 'sell', shift: 1} :
+        {value: 'buy', shift: 1}
+    },
+    txFields.longField('price'),
+    txFields.longField('amount'),
+    txFields.timestamp,
+    txFields.longField('expiration'),
+    txFields.longField('matcherFee')
+  ]
+};
 /**
  * Maps transaction types to schemas object. Schemas are written by keys. 0 - no version, n - version n
  */
@@ -425,7 +464,7 @@ export const schemasByTypeMap = {
     1: setScriptSchemaV1
   },
   [TRANSACTION_TYPE.SPONSORSHIP]: {
-    1: sponsorshipV1
+    1: sponsorshipSchemaV1
   },
   [TRANSACTION_TYPE.SET_ASSET_SCRIPT]: {
     1: setAssetScriptSchemaV1

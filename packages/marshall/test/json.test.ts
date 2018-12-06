@@ -1,4 +1,4 @@
-import {parse, parseJSON, serialize, stringify} from "../src";
+import {parseTx, parseJSON, serializeTx, stringify} from "../src";
 import Long = require("long");
 import {exampleTxs} from "./exampleTxs";
 

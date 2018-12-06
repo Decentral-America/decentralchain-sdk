@@ -101,6 +101,7 @@ export const massTransferTx = {
   type: 11,
   version: 1,
   fee: 200000,
+  assetId: '7GGPvAPV3Gmxo4eswmBRLb6bXXEhAovPinfcwVkA2LJh',
   senderPublicKey: '7GGPvAPV3Gmxo4eswmBRLb6bXXEhAovPinfcwVkA2LJh',
   timestamp: 1542539421576,
   proofs:
@@ -110,7 +111,7 @@ export const massTransferTx = {
     {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000},
     {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000}
   ],
-  attachment: 'aAaABbbBB43Cc'
+  attachment: 'aAaABbbBB43CcccffrrRRxxVVggFFrrEEwwZZyyYY22335511224422LL'
 }
 
 export const dataTx = {
@@ -169,6 +170,22 @@ export const setAssetScriptTx = {
   script: 'base64:AQa3b8tH',
   assetId: '5xhvoX9caefDAiiRgUzZQSUHyKfjW5Wx2v2Vr8QR9e4d'
 }
+
+export const order = {
+  orderType: 'buy',
+  assetPair:
+    { amountAsset: undefined,
+      priceAsset: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS' },
+  price: 10,
+  amount: 100000000,
+  timestamp: 1544102345137,
+  expiration: 1545830345137,
+  matcherFee: 300000,
+  matcherPublicKey: '7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy',
+  senderPublicKey: 'G62H1XE5rnaCgCCURV5pWwQHzWezZB7VkkVgqthdKgkj',
+  proofs:
+    [ 'eebXEov2fRr3Bqr1iXtUcAJ8qZsUMomKpU6qbb3eETqTzZtkBR5UmQ7Jda23jXwrufEusgR1eoKDGQgBD2UGLQ6' ],
+  id: '2gP6g5z5fYQ7NoLZXEDijxymFQBToDSJDPm6UyNZ2H2R' }
 
 export const exampleTxs = {
   3: issueTx,
