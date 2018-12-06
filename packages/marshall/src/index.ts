@@ -3,36 +3,41 @@ import {serializerFromSchema} from "./serialize";
 import {parseHeader, parserFromSchema} from "./parse";
 import {txToJson} from "./txToJson";
 
-export function serializeTx<LONG = string | number>(tx: any, longFactory?: ILongFactory<LONG>): Uint8Array {
-  const {type, version} = tx;
-  const schema = getSchema(type, version);
+export namespace binary {
+  export function serializeTx<LONG = string | number>(tx: any, longFactory?: ILongFactory<LONG>): Uint8Array {
+    const {type, version} = tx;
+    const schema = getSchema(type, version);
 
-  return serializerFromSchema(schema, longFactory)(tx);
+    return serializerFromSchema(schema, longFactory)(tx);
+  }
+
+  export function parseTx<LONG = string>(bytes: Uint8Array, longFactory?: ILongFactory<LONG>) {
+    const {type, version} = parseHeader(bytes);
+    const schema = getSchema(type, version);
+
+    return parserFromSchema(schema, longFactory)(bytes).value;
+  }
 }
 
-export function parseTx<LONG = string>(bytes: Uint8Array, longFactory?: ILongFactory<LONG>) {
-  const {type, version} = parseHeader(bytes);
-  const schema = getSchema(type, version);
+export namespace json {
+  export function parseTx<LONG = string>(str: string, lf?: ILongFactory<LONG>) {
+    const safeStr = str.replace(/(".+?"[ \t\n]*:[ \t\n]*)(\d{15,})/gm, '$1"$2"');
+    let tx = JSON.parse(safeStr);
 
-  return parserFromSchema(schema, longFactory)(bytes).value;
+    //ToDo: rewrite. Now simply serializes and then parses with long  factory to get right long types
+    return lf ? convert(tx, lf) : tx
+  }
+
+  export function stringifyTx(tx: any): string {
+    const txWithStrings = convert(tx);
+    return txToJson(txWithStrings)
+  }
 }
 
-export function parseJSON<LONG = string>(str: string, lf?: ILongFactory<LONG>) {
-  const safeStr = str.replace(/(".+?"[ \t\n]*:[ \t\n]*)(\d{15,})/gm, '$1"$2"');
-  let tx = JSON.parse(safeStr);
-
-  //ToDo: rewrite. Now simply serializes and then parses with long  factory to get right long types
-  return lf ? convert(tx, lf) : tx
-}
-
-export function stringify(tx: any): string {
-  const txWithStrings = convert(tx);
-  return txToJson(txWithStrings)
-}
 
 
 export function convert<T = string, R = string>(tx: any, toLf?: ILongFactory<T>, fromLf?: ILongFactory<R>) {
-  return parseTx(serializeTx(tx, fromLf), toLf)
+  return binary.parseTx(binary.serializeTx(tx, fromLf), toLf)
 }
 
 export function getSchema(type: number, version?: number) {

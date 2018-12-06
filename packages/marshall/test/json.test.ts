@@ -1,4 +1,4 @@
-import {parseTx, parseJSON, serializeTx, stringify} from "../src";
+import {json} from "../src/";
 import Long = require("long");
 import {exampleTxs} from "./exampleTxs";
 
@@ -9,13 +9,13 @@ describe('Basic serialization', ()=> {
   "data":[{"type":"binary","key":"a","value":"base64:AQIDBA=="},{"type":"binary","key":"b","value":"base64:YXNkYQ=="},{"type":"boolean","key":"c","value":true},{"type":"integer","key":"d","value":9223372036854775808}]}`
 
   it('Should not break numbers', () => {
-    const parsed = parseJSON(txJson);
+    const parsed = json.parseTx(txJson);
     expect(typeof parsed.data[3].value).toBe('string')
     console.log()
   });
 
   it('Should convert numbers using factory', () => {
-    const parsed = parseJSON(txJson, {toString:(x:any)=>x, fromString: x=> Long.fromString(x)});
+    const parsed = json.parseTx(txJson, {toString:(x:any)=>x, fromString: x=> Long.fromString(x)});
     expect(parsed.data[3].value).toBeInstanceOf(Long)
   })
 
@@ -25,8 +25,8 @@ describe('Basic serialization', ()=> {
 describe('All tx json to and from', ()=>{
   Object.entries(exampleTxs).forEach(([type, tx]) => {
     it(`Type: ${type}. toJSON, fromJSON`, () => {
-      const str = stringify(tx);
-      const parsed = parseJSON(str)
+      const str = json.stringifyTx(tx);
+      const parsed = json.parseTx(str)
       expect(tx).toMatchObject(parsed)
     })
   });
