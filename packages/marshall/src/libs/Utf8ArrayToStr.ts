@@ -11,7 +11,7 @@
 /**
  * @return {string}
  */
-function Utf8ArrayToStr(array) {
+export function Utf8ArrayToStr(array: Uint8Array) {
     var out, i, len, c;
     var char2, char3;
 
@@ -44,4 +44,3 @@ function Utf8ArrayToStr(array) {
 
     return out;
 }
-exports.Utf8ArrayToStr = Utf8ArrayToStr;

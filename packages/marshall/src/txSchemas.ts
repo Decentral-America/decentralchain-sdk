@@ -259,8 +259,8 @@ const aliasSchemaV2 = {
     txFields.version,
     txFields.senderPublicKey,
     txFields.alias,
-    txFields.timestamp,
-    txFields.fee
+    txFields.fee,
+    txFields.timestamp
   ]
 };
 

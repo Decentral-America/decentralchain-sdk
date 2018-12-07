@@ -2,10 +2,6 @@ import { binary } from "../src";
 import {exampleTxs, order} from "./exampleTxs";
 import Long = require("long");
 import BigNumber from "bignumber.js";
-import {serializerFromSchema} from "../src/serialize";
-import {orderSchemaV0} from "../src/txSchemas";
-import {parserFromSchema} from "../src/parse";
-
 
 describe('Tx serialize/parse', ()=> {
   Object.entries(exampleTxs).forEach(([type, tx]) => {
@@ -17,8 +13,8 @@ describe('Tx serialize/parse', ()=> {
   });
 
   it('Should correctly serialize order', ()=>{
-    const bytes = serializerFromSchema(orderSchemaV0)(order);
-    const parsed = parserFromSchema<number>(orderSchemaV0, {toString: (x)=>String(x),fromString:(x)=>parseInt(x)})(bytes).value;
+    const bytes = binary.serializeOrder(order);
+    const parsed = binary.parseOrder<number>(bytes, {toString: (x)=>String(x),fromString:(x)=>parseInt(x)});
     expect(order).toMatchObject(parsed)
   });
 
