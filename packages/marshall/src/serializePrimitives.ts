@@ -3,8 +3,18 @@ import * as Base64 from "base64-js"
 import * as Long from "long";
 import {concat} from "./libs/utils";
 
+//ToDo: perfomance issue
+// function stringToUint8Array(str: string) {
+//   const result: number[] = []
+//   const unescaped = unescape(encodeURIComponent(str))
+//
+//   for (let c of unescaped){
+//     result.push(c.charCodeAt(0))
+//   }
+//   return Uint8Array.from(result)
+// }
 const stringToUint8Array = (str: string) =>
-  Uint8Array.from([...unescape(encodeURIComponent(str))].map(c => c.charCodeAt(0)))
+  Uint8Array.from([...unescape(encodeURIComponent(str))].map(c => c.charCodeAt(0)));
 
 type Option<T> = T | null | undefined
 
@@ -29,11 +39,13 @@ export const BYTES: TSerializer<Uint8Array | number[]> = (value: Uint8Array | nu
 export const SHORT: TSerializer<number> = (value: number) => {
   const s = Long.fromNumber(value, true);
   return Uint8Array.from(s.toBytesBE().slice(6))
-}
+};
+
 export const INT: TSerializer<number> = (value: number) => {
   const i = Long.fromNumber(value, true);
   return Uint8Array.from(i.toBytesBE().slice(4))
-}
+};
+
 export const OPTION = <T, R = T | null | undefined>(s: TSerializer<T>): TSerializer<R> => (value: R) =>
   value == null
   || (typeof value == 'string' && value.length == 0)
@@ -43,13 +55,13 @@ export const LEN = (lenSerializer: TSerializer<number>) => <T>(valueSerializer: 
   const data = valueSerializer(value);
   const len = lenSerializer(data.length);
   return concat(len, data)
-}
+};
 
 export const COUNT = (countSerializer: TSerializer<number>) => <T>(itemSerializer: TSerializer<T>) => (items: T[]) => {
-  const data = concat(...items.map(x => itemSerializer(x)))
-  const len = countSerializer(items.length)
+  const data = concat(...items.map(x => itemSerializer(x)));
+  const len = countSerializer(items.length);
   return concat(len, data)
-}
+};
 
 export const LONG: TSerializer<number | string> = (value: number | string) => {
   let l: Long;
@@ -62,6 +74,6 @@ export const LONG: TSerializer<number | string> = (value: number | string) => {
     l = Long.fromString(value.toString(), true)
   }
   return Uint8Array.from(l.toBytesBE())
-}
+};
 
 export const SCRIPT: TSerializer<string | null> = (script) => OPTION(LEN(SHORT)(BASE64_STRING))(script ? script.slice(7) : null);

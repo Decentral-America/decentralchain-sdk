@@ -13,7 +13,7 @@ export const issueTx = {
   quantity: 10000,
   name: 'test',
   description: 'tratata',
-  script: null
+  script: 'base64:AQQAAAAHJG1hdGNoMAUAAAACdHgDCQAAAQAAAAIFAAAAByRtYXRjaDACAAAAD0J1cm5UcmFuc2FjdGlvbgQAAAABdAUAAAAHJG1hdGNoMAcGPmRSDA=='
 }
 
 export const transferTx = {
