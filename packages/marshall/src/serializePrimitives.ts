@@ -26,7 +26,7 @@ export const one: Uint8Array = Uint8Array.from([1]);
 
 export const BASE58_STRING: TSerializer<string> = (value: string) => base58.decode(value);
 
-export const BASE64_STRING: TSerializer<string> = (value: string) => Base64.toByteArray(value);
+export const BASE64_STRING: TSerializer<string> = (value: string) => Base64.toByteArray(value.replace('base64:', ''));
 
 export const STRING: TSerializer<Option<string>> = (value: Option<string>) => value ? stringToUint8Array(value) : empty;
 

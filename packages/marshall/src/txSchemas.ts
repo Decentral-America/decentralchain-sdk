@@ -1,7 +1,7 @@
 import {
-  BASE58_STRING,
+  BASE58_STRING, BASE64_STRING,
   BOOL,
-  BYTE,
+  BYTE, empty, INT,
   LEN,
   LONG,
   OPTION, SCRIPT,
@@ -13,7 +13,7 @@ import {
   byteToBase58, P_BOOLEAN,
   byteToScript,
   byteToStringWithLength,
-  P_LONG, P_OPTION, P_BYTE, byteToBase58WithLength
+  P_LONG, P_OPTION, P_BYTE, byteToBase58WithLength, P_BASE58_FIXED, P_BASE58_VAR, P_SHORT, P_STRING_VAR, P_BASE64, P_INT
 } from './parsePrimitives'
 
 //Todo: import this enums from ts-types package
@@ -33,6 +33,7 @@ export enum TRANSACTION_TYPE {
   SET_SCRIPT = 13,
   SPONSORSHIP = 14,
   SET_ASSET_SCRIPT = 15,
+  CONTRACT_INVOCATION = 16
 }
 
 export enum DATA_FIELD_TYPE {
@@ -54,14 +55,14 @@ export type TObject = {
 export type TArray = {
   name: string;
   type: 'array';
-  items: TSchema
+  items: TSchema;
 }
 
 export type TAnyOf = {
   name: string;
   type: 'anyOf';
   discriminant: string;
-  items: Map<string, TObject | TAnyOf>;
+  items: Map<string, TSchema>;
 }
 
 export type TPrimitive = {
@@ -80,7 +81,6 @@ export type TDataTxField = {
 
 
 export namespace txFields {
-
   //Field constructors
   export const longField = (name: string) => ({
     name,
@@ -103,20 +103,26 @@ export namespace txFields {
   export const stringField = (name: string) => ({
     name,
     toBytes: LEN(SHORT)(STRING),
-    fromBytes: byteToStringWithLength
+    fromBytes: P_STRING_VAR(P_SHORT)
   });
 
-  export const base58field = (name: string) => ({
+  export const base58field32 = (name: string) => ({
     name,
     toBytes: BASE58_STRING,
-    fromBytes: byteToBase58
+    fromBytes: P_BASE58_FIXED(32)
   });
 
-  export const optionalBase58field = (name: string) => ({
+  export const base58Option32 = (name: string) => ({
     name,
     toBytes: OPTION(BASE58_STRING),
-    fromBytes: P_OPTION(byteToBase58)
+    fromBytes: P_OPTION(P_BASE58_FIXED(32))
   });
+
+  export const base64field = (name: string) => ({
+    name,
+    toBytes: BASE64_STRING,
+    fromBytes: P_BASE64(P_SHORT)
+  })
 
   // Primitive fields
   export const alias = {
@@ -128,17 +134,13 @@ export namespace txFields {
 
   export const assetDescription = stringField('description');
 
-  export const assetId = {
-    name: 'assetId',
-    toBytes: BASE58_STRING,
-    fromBytes: byteToBase58
-  };
+  export const assetId = base58field32('assetId');
   export const assetName = stringField('name');
 
   export const attachment = {
     name: 'attachment',
     toBytes: LEN(SHORT)(BASE58_STRING),
-    fromBytes: byteToBase58WithLength
+    fromBytes: P_BASE58_VAR(P_SHORT)
   }
 
   export const chainId = byteField('chainId');
@@ -147,21 +149,12 @@ export namespace txFields {
 
   export const fee = longField('fee');
 
-  export const leaseAssetId = {
-    name: 'leaseAssetId',
-    toBytes: OPTION(BASE58_STRING),
-    fromBytes: P_OPTION(byteToBase58)
-  };
-  export const leaseId = {
-    name: 'leaseId',
-    toBytes: BASE58_STRING,
-    fromBytes: byteToBase58
-  };
-  export const optionalAssetId = {
-    name: 'assetId',
-    toBytes: OPTION(BASE58_STRING),
-    fromBytes: P_OPTION(byteToBase58)
-  };
+  export const leaseAssetId = base58Option32('leaseAssetId');
+
+  export const leaseId = base58field32('leaseId');
+
+  export const optionalAssetId = base58Option32('assetId');
+
   export const quantity = longField('quantity');
 
   export const reissuable = booleanField('reissuable');
@@ -176,11 +169,7 @@ export namespace txFields {
     toBytes: SCRIPT,
     fromBytes: byteToScript
   };
-  export const senderPublicKey = {
-    name: 'senderPublicKey',
-    toBytes: BASE58_STRING,
-    fromBytes: byteToBase58,
-  };
+  export const senderPublicKey = base58field32('senderPublicKey');
 
   export const timestamp = longField('timestamp');
 
@@ -211,7 +200,23 @@ export namespace txFields {
       [DATA_FIELD_TYPE.INTEGER, longField('value')],
       [DATA_FIELD_TYPE.BOOLEAN, booleanField('value')],
       [DATA_FIELD_TYPE.STRING, stringField('value')],
-      [DATA_FIELD_TYPE.BINARY, stringField('value')]
+      [DATA_FIELD_TYPE.BINARY, base64field('value')]
+    ])
+  };
+
+  export const functionArgField: TAnyOf = {
+    name: 'functionArgField',
+    type: 'anyOf',
+    discriminant: 'type',
+    items: new Map<string, TSchema>([
+      ['long', longField('value')],
+      ['bytes', {name: '', toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}],
+      ['string', {name: '', toBytes: LEN(INT)(STRING), fromBytes: P_STRING_VAR(P_INT)}],
+      [(Symbol('placeholder')) as any, {} as any],
+      [(Symbol('placeholder')) as any, {} as any],
+      [(Symbol('placeholder')) as any, {} as any],
+      ['true', {name:'true', toBytes: ()=>Uint8Array.from([]), fromBytes: ()=>({value:true, shift:0})}],
+      ['false', {name:'false', toBytes: ()=>Uint8Array.from([]), fromBytes: ()=>({value:true, shift:0})}],
     ])
   };
 
@@ -220,6 +225,19 @@ export namespace txFields {
     type: 'array',
     items: dataTxField
   };
+
+  export const functionCall: TObject = {
+    name: 'function',
+    type: 'object',
+    schema: [
+      {
+        name: 'name',
+        toBytes: LEN(SHORT)(STRING),
+        fromBytes: P_STRING_VAR(P_SHORT)
+      },
+      functionArgField
+    ]
+  }
 }
 
 export const orderSchemaV0: TObject = {
@@ -232,8 +250,8 @@ export const orderSchemaV0: TObject = {
       name: 'assetPair',
       type: 'object',
       schema: [
-        txFields.optionalBase58field('amountAsset'),
-        txFields.optionalBase58field('priceAsset')
+        txFields.base58Option32('amountAsset'),
+        txFields.base58Option32('priceAsset')
       ]
     },
     {
@@ -292,6 +310,25 @@ const cancelLeaseSchemaV2 = {
     txFields.leaseId
   ]
 };
+
+const contractInvocationSchemaV1 = {
+  name: 'contractInvocationSchemaV1',
+  type: 'object',
+  schema: [
+    txFields.type,
+    txFields.version,
+    txFields.chainId,
+    {
+      name: 'contractAddress',
+      toBytes: BASE58_STRING,
+      fromBytes: P_BASE58_FIXED(26),
+    },
+    txFields.functionCall,
+    txFields.fee,
+    txFields.timestamp,
+  ]
+}
+
 
 const dataSchemaV1 = {
   name: 'dataSchemaV1',
@@ -427,7 +464,8 @@ const sponsorshipSchemaV1 = {
     txFields.fee,
     txFields.timestamp
   ]
-}
+};
+
 const transferSchemaV2 = {
   name: 'transferSchemaV2',
   type: 'object',
@@ -490,6 +528,9 @@ export const schemasByTypeMap = {
   },
   [TRANSACTION_TYPE.SET_ASSET_SCRIPT]: {
     1: setAssetScriptSchemaV1
+  },
+  [TRANSACTION_TYPE.CONTRACT_INVOCATION]: {
+    1: contractInvocationSchemaV1
   }
 };
 

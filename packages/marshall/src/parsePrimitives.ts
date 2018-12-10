@@ -1,7 +1,7 @@
 import * as Long from "long";
 import {Utf8ArrayToStr} from './libs/Utf8ArrayToStr'
 import base58 from './libs/base58';
-import {fromByteArray} from 'base64-js';
+import * as Base64 from "base64-js"
 
 export const ALIAS_VERSION: number = 2;
 
@@ -22,25 +22,45 @@ export const P_BYTE: TParser<number> = (bytes, start = 0) => ({value: bytes[star
 
 export const P_SHORT: TParser<number> = (bytes, start = 0) => ({value: 256 * bytes[start] + bytes[start + 1], shift: 2});
 
+export const P_INT: TParser<number> = (bytes, start = 0) => ({value: 2^24 * bytes[start] + 2^16 * bytes[start + 1] +  2^8 * bytes[start + 2] +  bytes[start + 3], shift: 4});
+
 export const P_LONG: TParser<string> = (bytes, start = 0) => ({
   value: Long.fromBytesBE(Array.from(bytes.slice(start, start + 8)), true).toString(),
   shift: 8
 });
-
-// export const P_LEN = <T>(lenParser: TParser<number>) => (parser: TParser<T>): TParser<T> => (bytes: Uint8Array, start = 0) => {
-//   const lenInfo = lenParser(bytes, start);
-//   const {value, shift} = parser(bytes.slice(start + lenInfo.shift, start + lenInfo.shift + lenInfo.value));
-//   return {
-//     value,
-//     shift: lenInfo.shift + lenInfo.value
-//   }
-// };
 
 export const P_BOOLEAN = (bytes: Uint8Array, start = 0) => {
   const value = !!bytes[start];
   return {value, shift: 1};
 };
 
+export const P_STRING_FIXED = (len: number): TParser<string> => (bytes: Uint8Array, start: number = 0) => {
+  const value = Utf8ArrayToStr(bytes.slice(start, start + len));
+  return {shift: len, value};
+};
+
+export const P_STRING_VAR = (lenParser: TParser<number>) => (bytes: Uint8Array, start: number = 0) => {
+  const lengthInfo = lenParser(bytes, start);
+  const {value} = P_STRING_FIXED(lengthInfo.value)(bytes, start + LENGTH_SIZE);
+  return {shift: lengthInfo.value + LENGTH_SIZE, value};
+};
+
+export const P_BASE58_FIXED = (len: number): TParser<string> => (bytes: Uint8Array, start: number = 0) => {
+  const value = base58.encode(bytes.slice(start, start + len));
+  return {value, shift: len};
+};
+
+export const P_BASE58_VAR = (lenParser: TParser<number>) => (bytes: Uint8Array, start: number = 0) => {
+  const lengthInfo = lenParser(bytes, start);
+  const {value} = P_BASE58_FIXED(lengthInfo.value)(bytes, start + LENGTH_SIZE);
+  return {shift: lengthInfo.value + LENGTH_SIZE, value};
+};
+
+export const P_BASE64 = (lenParser: TParser<number>) => (bytes: Uint8Array, start: number = 0) => {
+  const lengthInfo = lenParser(bytes, start);
+  const value = `base64:${ Base64.fromByteArray(bytes.slice(start + lengthInfo.shift, start + lengthInfo.shift + lengthInfo.value))}}`;
+  return {shift: lengthInfo.value + lengthInfo.shift, value};
+};
 
 const byteToString = (shift: number) => (bytes: Uint8Array, start: number) => {
   const value = Utf8ArrayToStr(bytes.slice(start, start + shift))
@@ -89,7 +109,7 @@ export const byteToScript = (bytes: Uint8Array, start: number = 0) => {
   const lengthInfo = P_SHORT(bytes, start + VERSION_LENGTH);
   const from = start + VERSION_LENGTH + lengthInfo.shift;
   const to = start + VERSION_LENGTH + lengthInfo.shift + lengthInfo.value;
-  const value = `base64:${fromByteArray(bytes.slice(from, to))}`;
+  const value = `base64:${Base64.fromByteArray(bytes.slice(from, to))}`;
 
   return {value, shift: to - start};
 };
