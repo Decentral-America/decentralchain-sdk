@@ -25,14 +25,14 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
     result = concat(result, objBytes)
   }
   else if (schema.type === 'anyOf') {
-    const type = obj[schema.discriminant];
+    const type = obj[schema.discriminatorField || 'type'];
     const typeSchema = schema.items.get(type);
     if (typeSchema == null) {
-      throw new Error(`Serializer Error: Unknown anyOf type: ${schema.discriminant}.${type}`)
+      throw new Error(`Serializer Error: Unknown anyOf type: ${schema.discriminatorField}.${type}`)
     }
     const typeCode = [...schema.items.values()].findIndex(schema => schema === typeSchema);
     serializer = serializerFromSchema(typeSchema, lf);
-    itemBytes = serializer(obj);
+    itemBytes = serializer(obj[schema.valueField || 'value']);
     result = concat(result, BYTE(typeCode), itemBytes);
   }
   else if (schema.type === 'primitive' || schema.type === undefined) {

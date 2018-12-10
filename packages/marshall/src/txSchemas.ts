@@ -59,7 +59,8 @@ export type TArray = {
 export type TAnyOf = {
   name: string;
   type: 'anyOf';
-  discriminant: string;
+  discriminatorField?: string;
+  valueField?: string;
   items: Map<string, TSchema>;
 }
 
@@ -203,12 +204,12 @@ export namespace txFields {
   };
 
   export const functionArgField: TAnyOf = {
-    name: 'functionArgField',
+    name: 'args',
     type: 'anyOf',
-    discriminant: 'type',
+    discriminatorField: 'type',
     items: new Map<string, TSchema>([
       ['long', longField('value')],
-      ['bytes', {name: '', toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}],
+      ['binary', {name: '', toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}],
       ['string', {name: '', toBytes: LEN(INT)(STRING), fromBytes: P_STRING_VAR(P_INT)}],
       [(Symbol('placeholder')) as any, {} as any],
       [(Symbol('placeholder')) as any, {} as any],
@@ -233,7 +234,11 @@ export namespace txFields {
         toBytes: LEN(SHORT)(STRING),
         fromBytes: P_STRING_VAR(P_SHORT)
       },
-      functionArgField
+      {
+        name: 'args',
+        type: 'array',
+        items: functionArgField
+      }
     ]
   }
 }

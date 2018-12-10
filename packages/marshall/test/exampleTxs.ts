@@ -229,14 +229,16 @@ export const contractInvocationTx = {
   "proofs": ["CC1jQ4qkuVfMvB2Kpg2Go6QKXJxUFC8UUswUxBsxwisrR8N5s3Yc8zA6dhjTwfWKfdouSTAnRXCxTXb3T6pJq3T"],
   "version": 1,
   "contractAddress": "3N5GRqzDBhjVXnCn44baHcz2GoZy5qLxtTh",
-  "function": "foo",
-  "args": [
-    {
-      "key": "",
-      "type": "binary",
-      "value": "base64:YWxpY2U="
-    }
-  ]
+  "function":{
+    name: "foo",
+    args: [
+      {
+        "key": "",
+        "type": "binary",
+        "value": "base64:YWxpY2U="
+      }
+    ]
+  }
 }
 export const order = {
   orderType: 'buy',
