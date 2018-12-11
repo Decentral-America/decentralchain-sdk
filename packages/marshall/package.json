@@ -8,6 +8,9 @@
     "prepublishOnly": "tsc"
   },
   "author": "Wavesplatform",
+  "contributors": [
+    "siemarell"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/base64-js": "^1.2.5",
