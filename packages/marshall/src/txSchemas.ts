@@ -198,8 +198,8 @@ export namespace txFields {
     items: new Map<DATA_FIELD_TYPE, TSchema>([
       [DATA_FIELD_TYPE.INTEGER, longField('value')],
       [DATA_FIELD_TYPE.BOOLEAN, booleanField('value')],
-      [DATA_FIELD_TYPE.STRING, stringField('value')],
-      [DATA_FIELD_TYPE.BINARY, base64field('value')]
+      [DATA_FIELD_TYPE.BINARY, base64field('value')],
+      [DATA_FIELD_TYPE.STRING, stringField('value')]
     ])
   };
 
