@@ -1,10 +1,11 @@
 {
-  "name": "@waves/parse-serialize",
+  "version": "0.0.1",
+  "name": "@waves/marshall",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "prepublishOnly": ""
+    "prepublishOnly": "tsc"
   },
   "author": "Wavesplatform",
   "license": "MIT",
