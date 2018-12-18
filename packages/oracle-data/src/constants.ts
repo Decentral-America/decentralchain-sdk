@@ -1,8 +1,9 @@
 export enum STATUS_LIST {
     SCAM = -2,
     SUSPICIOUS = -1,
-    DETAILED = 0,
-    VERIFIED = 1
+    NOT_VERIFY = 0,
+    DETAILED = 1,
+    VERIFIED = 2
 }
 
 export enum DATA_PROVIDER_VERSIONS {
