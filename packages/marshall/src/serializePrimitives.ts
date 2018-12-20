@@ -3,16 +3,6 @@ import * as Base64 from "base64-js"
 import * as Long from "long";
 import {concat} from "./libs/utils";
 
-//ToDo: perfomance issue
-// function stringToUint8Array(str: string) {
-//   const result: number[] = []
-//   const unescaped = unescape(encodeURIComponent(str))
-//
-//   for (let c of unescaped){
-//     result.push(c.charCodeAt(0))
-//   }
-//   return Uint8Array.from(result)
-// }
 const stringToUint8Array = (str: string) =>
   Uint8Array.from([...unescape(encodeURIComponent(str))].map(c => c.charCodeAt(0)));
 
@@ -69,9 +59,9 @@ export const LONG: TSerializer<number | string> = (value: number | string) => {
     if (value > 2 ** 53 - 1) {
       throw new Error(`${value} is too big to be precisely represented as js number. Use string instead`)
     }
-    l = Long.fromNumber(value, true)
+    l = Long.fromNumber(value)
   } else {
-    l = Long.fromString(value.toString(), true)
+    l = Long.fromString(value.toString())
   }
   return Uint8Array.from(l.toBytesBE())
 };

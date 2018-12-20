@@ -1,4 +1,4 @@
-import {schemasByTypeMap, ILongFactory, orderSchemaV0,} from "./txSchemas";
+import {schemasByTypeMap, ILongFactory, orderSchemaV0, orderSchemaV2,} from "./txSchemas";
 import {serializerFromSchema} from "./serialize";
 import {parseHeader, parserFromSchema} from "./parse";
 import {txToJson} from "./txToJson";
@@ -11,6 +11,9 @@ export namespace binary {
     return serializerFromSchema(schema, longFactory)(tx);
   }
 
+  /**
+   * This function cannot transactions without version
+   */
   export function parseTx<LONG = string>(bytes: Uint8Array, longFactory?: ILongFactory<LONG>) {
     const {type, version} = parseHeader(bytes);
     const schema = getSchema(type, version);
@@ -19,11 +22,16 @@ export namespace binary {
   }
 
   export function serializeOrder<LONG = string | number>(ord: any, longFactory?: ILongFactory<LONG>): Uint8Array {
-    return serializerFromSchema(orderSchemaV0, longFactory)(ord);
+    const { version } = ord;
+    const schema = version == 2 ? orderSchemaV2 : orderSchemaV0;
+    return serializerFromSchema(schema, longFactory)(ord);
   }
 
+  /**
+   * This function cannot parse OrderV1, which doesn't have version field
+   */
   export function parseOrder<LONG = string>(bytes: Uint8Array, longFactory?: ILongFactory<LONG>) {
-    return parserFromSchema(orderSchemaV0, longFactory)(bytes).value;
+    return parserFromSchema(orderSchemaV2, longFactory)(bytes).value;
   }
 }
 

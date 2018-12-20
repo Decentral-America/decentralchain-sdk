@@ -20,6 +20,12 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     return {value: result, shift: cursor - start}
   }
   else if (schema.type === 'object') {
+    if(schema.optional){
+      const exists = bytes[cursor] === 1;
+      cursor +=1;
+      if (!exists) return {value: undefined, shift: 1}
+    }
+
     //we don't need object length to parse it since we have schema of all its fields
     if(schema.withLength) cursor += 2;
     const result: any = {};

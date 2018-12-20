@@ -1,7 +1,9 @@
 import { binary } from "../src";
-import {exampleTxs, order} from "./exampleTxs";
+import {exampleTxs, orderV0, orderV2} from "./exampleTxs";
 import Long = require("long");
 import BigNumber from "bignumber.js";
+import {parserFromSchema} from "../src/parse";
+import {orderSchemaV0} from "../src/txSchemas";
 
 describe('Tx serialize/parse', ()=> {
   Object.entries(exampleTxs).forEach(([type, tx]) => {
@@ -12,10 +14,16 @@ describe('Tx serialize/parse', ()=> {
     })
   });
 
-  it('Should correctly serialize order', ()=>{
-    const bytes = binary.serializeOrder(order);
+  it('Should correctly serialize old order', ()=>{
+    const bytes = binary.serializeOrder(orderV0);
+    const parsed = parserFromSchema<number>(orderSchemaV0, {toString: (x)=>String(x),fromString:(x)=>parseInt(x)})(bytes).value;
+    expect(orderV0).toMatchObject(parsed)
+  });
+
+  it('Should correctly serialize new order', ()=>{
+    const bytes = binary.serializeOrder(orderV2);
     const parsed = binary.parseOrder<number>(bytes, {toString: (x)=>String(x),fromString:(x)=>parseInt(x)});
-    expect(order).toMatchObject(parsed)
+    expect(orderV2).toMatchObject(parsed)
   });
 
   it('Should correctly serialize LONGjs', ()=>{

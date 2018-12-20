@@ -229,7 +229,7 @@ export const contractInvocationTx = {
   "proofs": ["CC1jQ4qkuVfMvB2Kpg2Go6QKXJxUFC8UUswUxBsxwisrR8N5s3Yc8zA6dhjTwfWKfdouSTAnRXCxTXb3T6pJq3T"],
   "version": 1,
   "contractAddress": "3N5GRqzDBhjVXnCn44baHcz2GoZy5qLxtTh",
-  "function":{
+  "call":{
     name: "foo",
     args: [
       {
@@ -238,9 +238,13 @@ export const contractInvocationTx = {
         "value": "base64:YWxpY2U="
       }
     ]
+  },
+  "payment" : {
+    "amount" : 7,
+    "assetId" : "FM5ojNqW7e9cZ9zhPYGkpSP1Pcd8Z3e3MNKYVS5pGJ8Z"
   }
 }
-export const order = {
+export const orderV0 = {
   orderType: 'buy',
   assetPair:
     {
@@ -259,6 +263,25 @@ export const order = {
   id: '2gP6g5z5fYQ7NoLZXEDijxymFQBToDSJDPm6UyNZ2H2R'
 }
 
+export const orderV2 = {
+  orderType: 'buy',
+  version: 2,
+  assetPair:
+    {
+      amountAsset: undefined,
+      priceAsset: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS'
+    },
+  price: 10,
+  amount: 100000000,
+  timestamp: 1544102345137,
+  expiration: 1545830345137,
+  matcherFee: 300000,
+  matcherPublicKey: '7kPFrHDiGw1rCm7LPszuECwWYL3dMf6iMifLRDJQZMzy',
+  senderPublicKey: 'G62H1XE5rnaCgCCURV5pWwQHzWezZB7VkkVgqthdKgkj',
+  proofs:
+    ['eebXEov2fRr3Bqr1iXtUcAJ8qZsUMomKpU6qbb3eETqTzZtkBR5UmQ7Jda23jXwrufEusgR1eoKDGQgBD2UGLQ6'],
+  id: '2gP6g5z5fYQ7NoLZXEDijxymFQBToDSJDPm6UyNZ2H2R'
+}
 export const exampleTxs = {
   3: issueTx,
   4: transferTx,

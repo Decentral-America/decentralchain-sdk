@@ -2,9 +2,9 @@ import {BYTE, LEN, SHORT, TSerializer} from "./serializePrimitives";
 import {concat} from "./libs/utils";
 import {ILongFactory, TSchema, txFields} from "./txSchemas";
 
-// FixMe: currently longfactory does nothing. Maybe we should remove ot Altogether
+// FixMe: currently longfactory does nothing. Maybe we should remove it altogether
 export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf?: ILongFactory<LONG>): TSerializer<any> => (obj: any) => {
-  let result = Uint8Array.from([]);
+  //let result = Uint8Array.from([]);
 
   let serializer: TSerializer<any>,
     itemBytes: Uint8Array;
@@ -12,17 +12,27 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
   if (schema.type === 'array') {
     serializer = serializerFromSchema(schema.items, lf);
     itemBytes = concat(...obj.map((item: any) => serializer((item))));
-    result = concat(result, SHORT(obj.length), itemBytes);
+    return concat(SHORT(obj.length), itemBytes);
   }
   else if (schema.type === 'object') {
-    let objBytes = Uint8Array.from([])
+    let objBytes = Uint8Array.from([]);
+
+    if (schema.optional){
+      if(obj == null){
+        objBytes = concat(objBytes,[0]);
+        return objBytes
+      }else {
+        objBytes = concat(objBytes, [1])
+      }
+    }
+
     schema.schema.forEach(field => {
       serializer = serializerFromSchema(field, lf);
       itemBytes = serializer(obj[field.name]);
       objBytes = concat(objBytes, itemBytes);
     });
-    if (schema.withLength) result = concat(result, SHORT(objBytes.length))
-    result = concat(result, objBytes)
+    if (schema.withLength) objBytes = concat(SHORT(objBytes.length), objBytes)
+    return objBytes
   }
   else if (schema.type === 'anyOf') {
     const type = obj[schema.discriminatorField || 'type'];
@@ -33,10 +43,10 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
     const typeCode = [...schema.items.values()].findIndex(schema => schema === typeSchema);
     serializer = serializerFromSchema(typeSchema, lf);
     itemBytes = serializer(obj[schema.valueField || 'value']);
-    result = concat(result, BYTE(typeCode), itemBytes);
+    return concat(BYTE(typeCode), itemBytes);
   }
   else if (schema.type === 'primitive' || schema.type === undefined) {
-    result = concat(result, schema.toBytes(obj));
+    return schema.toBytes(obj);
   }
   else if (schema.type === 'dataTxField') {
     const keyBytes = txFields.stringField('').toBytes(obj.key);
@@ -48,10 +58,9 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
     const typeCode = [...schema.items.values()].findIndex(schema => schema === typeSchema);
     serializer = serializerFromSchema(typeSchema, lf);
     itemBytes = serializer(obj.value);
-    result = concat(result, keyBytes, BYTE(typeCode), itemBytes)
+    return concat(keyBytes, BYTE(typeCode), itemBytes)
   } else {
     throw new Error(`Serializer Error: Unknown schema type: ${schema!.type}`)
   }
 
-  return result
 };

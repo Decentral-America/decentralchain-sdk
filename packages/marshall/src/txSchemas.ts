@@ -48,6 +48,7 @@ export type TObject = {
   type: 'object';
   //Objects sometimes are needed to be serialized with length
   withLength?: boolean;
+  optional?: boolean;
   schema: TSchema[];
 }
 export type TArray = {
@@ -226,7 +227,7 @@ export namespace txFields {
   };
 
   export const functionCall: TObject = {
-    name: 'function',
+    name: 'call',
     type: 'object',
     schema: [
       {
@@ -241,12 +242,52 @@ export namespace txFields {
       }
     ]
   }
+
+  export const payment: TObject = {
+    name: 'payment',
+    optional: true,
+    type: 'object',
+    schema: [
+      amount,
+      optionalAssetId
+    ]
+  }
 }
 
 export const orderSchemaV0: TObject = {
   name: 'orderSchemaV0',
   type: 'object',
   schema: [
+    txFields.senderPublicKey,
+    {...txFields.senderPublicKey, name: 'matcherPublicKey'},
+    {
+      name: 'assetPair',
+      type: 'object',
+      schema: [
+        txFields.base58Option32('amountAsset'),
+        txFields.base58Option32('priceAsset')
+      ]
+    },
+    {
+      name: 'orderType',
+      toBytes: (type: string) => BYTE(type === 'sell' ? 1 : 0),
+      fromBytes: (bytes: Uint8Array, start = 0) => P_BYTE(bytes, start).value === 1 ?
+        {value: 'sell', shift: 1} :
+        {value: 'buy', shift: 1}
+    },
+    txFields.longField('price'),
+    txFields.longField('amount'),
+    txFields.timestamp,
+    txFields.longField('expiration'),
+    txFields.longField('matcherFee')
+  ]
+};
+
+export const orderSchemaV2: TObject = {
+  name: 'orderSchemaV2',
+  type: 'object',
+  schema: [
+    txFields.version,
     txFields.senderPublicKey,
     {...txFields.senderPublicKey, name: 'matcherPublicKey'},
     {
@@ -327,6 +368,7 @@ const contractInvocationSchemaV1 = {
       fromBytes: P_BASE58_FIXED(26),
     },
     txFields.functionCall,
+    txFields.payment,
     txFields.fee,
     txFields.timestamp,
   ]
