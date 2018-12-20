@@ -12,18 +12,13 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
   if (schema.type === 'array') {
     serializer = serializerFromSchema(schema.items, lf);
     itemBytes = concat(...obj.map((item: any) => serializer((item))));
-    return concat(SHORT(obj.length), itemBytes);
+    return concat((schema.toBytes || SHORT)(obj.length), itemBytes);
   }
   else if (schema.type === 'object') {
     let objBytes = Uint8Array.from([]);
 
-    if (schema.optional){
-      if(obj == null){
-        objBytes = concat(objBytes,[0]);
-        return objBytes
-      }else {
-        objBytes = concat(objBytes, [1])
-      }
+    if (schema.optional && obj == null){
+      return Uint8Array.from([0])
     }
 
     schema.schema.forEach(field => {
@@ -31,7 +26,10 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
       itemBytes = serializer(obj[field.name]);
       objBytes = concat(objBytes, itemBytes);
     });
-    if (schema.withLength) objBytes = concat(SHORT(objBytes.length), objBytes)
+
+    if (schema.withLength) objBytes = concat(SHORT(objBytes.length), objBytes);
+    if (schema.optional) objBytes = concat([1], objBytes);
+
     return objBytes
   }
   else if (schema.type === 'anyOf') {
@@ -43,7 +41,7 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
     const typeCode = [...schema.items.values()].findIndex(schema => schema === typeSchema);
     serializer = serializerFromSchema(typeSchema, lf);
     itemBytes = serializer(obj[schema.valueField || 'value']);
-    return concat(BYTE(typeCode), itemBytes);
+    return concat((schema.toBytes || BYTE)(typeCode), itemBytes);
   }
   else if (schema.type === 'primitive' || schema.type === undefined) {
     return schema.toBytes(obj);

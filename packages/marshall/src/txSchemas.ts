@@ -55,11 +55,15 @@ export type TArray = {
   name: string;
   type: 'array';
   items: TSchema;
+  toBytes?: any;
+  fromBytes?: any;
 }
 
 export type TAnyOf = {
   name: string;
   type: 'anyOf';
+  toBytes?: any;
+  fromBytes?: any;
   discriminatorField?: string;
   valueField?: string;
   items: Map<string, TSchema>;
@@ -208,6 +212,8 @@ export namespace txFields {
     name: 'args',
     type: 'anyOf',
     discriminatorField: 'type',
+    // toBytes: INT,
+    // fromBytes: P_INT,
     items: new Map<string, TSchema>([
       ['long', longField('value')],
       ['binary', {name: '', toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}],
@@ -230,14 +236,22 @@ export namespace txFields {
     name: 'call',
     type: 'object',
     schema: [
+      // special bytes to indicate function call. Used in Serde serializer
       {
-        name: 'name',
-        toBytes: LEN(SHORT)(STRING),
-        fromBytes: P_STRING_VAR(P_SHORT)
+        name: 'noName',
+        toBytes: () => Uint8Array.from([9, 1]),
+        fromBytes: () => ({value: undefined, shift:2})
+      },
+      {
+        name: 'function',
+        toBytes: LEN(INT)(STRING),
+        fromBytes: P_STRING_VAR(P_INT)
       },
       {
         name: 'args',
         type: 'array',
+        toBytes: INT,
+        fromBytes: P_INT,
         items: functionArgField
       }
     ]
@@ -246,10 +260,15 @@ export namespace txFields {
   export const payment: TObject = {
     name: 'payment',
     optional: true,
+    withLength: true,
     type: 'object',
     schema: [
       amount,
-      optionalAssetId
+      {
+        name: 'assetId',
+        toBytes: OPTION(LEN(SHORT)(BASE58_STRING)),
+        fromBytes: P_OPTION(P_BASE58_VAR(P_SHORT))
+      }
     ]
   }
 }
@@ -362,6 +381,7 @@ const contractInvocationSchemaV1 = {
     txFields.type,
     txFields.version,
     txFields.chainId,
+    txFields.senderPublicKey,
     {
       name: 'contractAddress',
       toBytes: BASE58_STRING,

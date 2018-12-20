@@ -7,7 +7,7 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
 
   if (schema.type === 'array') {
     const result: any[] = [];
-    const {value: len, shift} = P_SHORT(bytes, start);
+    const {value: len, shift} = (schema.fromBytes || P_SHORT)(bytes, start);
     cursor += shift;
 
     range(0, len).forEach(_ => {
@@ -41,7 +41,7 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     return {value: result, shift: cursor - start}
   }
   else if (schema.type === 'anyOf') {
-    const typeInfo = P_BYTE(bytes, cursor);
+    const typeInfo = (schema.fromBytes || P_BYTE)(bytes, cursor);
     cursor += typeInfo.shift;
 
     const item = Array.from(schema.items.values())[typeInfo.value];

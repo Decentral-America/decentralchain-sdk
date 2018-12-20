@@ -221,17 +221,12 @@ export const setAssetScriptTx = {
 
 export const contractInvocationTx = {
   "type": 16,
-  "id": "AujdgmwxSt8Gk9dPBDUm7mDAyc4vP1SWoVNgUHFvS9hu",
-  chainId: 87,
-  "senderPublicKey": "FM5ojNqW7e9cZ9zhPYGkpSP1Pcd8Z3e3MNKYVS5pGJ8Z",
-  "fee": 100000,
-  "timestamp": 1526910778245,
-  "proofs": ["CC1jQ4qkuVfMvB2Kpg2Go6QKXJxUFC8UUswUxBsxwisrR8N5s3Yc8zA6dhjTwfWKfdouSTAnRXCxTXb3T6pJq3T"],
   "version": 1,
-  "contractAddress": "3N5GRqzDBhjVXnCn44baHcz2GoZy5qLxtTh",
-  "call":{
-    name: "foo",
-    args: [
+  "senderPublicKey": "DguumUPw2zHh91WpaGWMsGvkJY1gFKJhjEBMBrV4NSG4",
+  "contractAddress": "3Fb641A9hWy63K18KsBJwns64McmdEATgJd",
+  "call": {
+    "function": "foo",
+    "args": [
       {
         "key": "",
         "type": "binary",
@@ -239,11 +234,19 @@ export const contractInvocationTx = {
       }
     ]
   },
-  "payment" : {
-    "amount" : 7,
-    "assetId" : "FM5ojNqW7e9cZ9zhPYGkpSP1Pcd8Z3e3MNKYVS5pGJ8Z"
-  }
+  "payment": {
+    "amount": 7,
+    "assetId": "73pu8pHFNpj9tmWuYjqnZ962tXzJvLGX86dxjZxGYhoK"
+  },
+  "fee": 100000,
+  "timestamp": 1545307831159,
+  "chainId": 68,
+  "proofs": [
+    "2vsHvu18goy1AsoADEYFM26eYEtAtVHRh9TLmMhPtUjwBfDmsySaLFExXwnBinZiCrKnUfVDiGTWuW57jUhiz9Ex"
+  ],
+  "id": "71TVxNGMwkkH5Q5MjfFun2DxxxTu7SK1GCbQGr2o1UqL"
 }
+
 export const orderV0 = {
   orderType: 'buy',
   assetPair:

@@ -25,7 +25,7 @@ export const P_SHORT: TParser<number> = (bytes, start = 0) => ({value: 256 * byt
 export const P_INT: TParser<number> = (bytes, start = 0) => ({value: 2**24 * bytes[start] + 2**16 * bytes[start + 1] +  2**8 * bytes[start + 2] +  bytes[start + 3], shift: 4});
 
 export const P_LONG: TParser<string> = (bytes, start = 0) => ({
-  value: Long.fromBytesBE(Array.from(bytes.slice(start, start + 8)), true).toString(),
+  value: Long.fromBytesBE(Array.from(bytes.slice(start, start + 8))).toString(),
   shift: 8
 });
 
@@ -41,8 +41,8 @@ export const P_STRING_FIXED = (len: number): TParser<string> => (bytes: Uint8Arr
 
 export const P_STRING_VAR = (lenParser: TParser<number>) => (bytes: Uint8Array, start: number = 0) => {
   const lengthInfo = lenParser(bytes, start);
-  const {value} = P_STRING_FIXED(lengthInfo.value)(bytes, start + LENGTH_SIZE);
-  return {shift: lengthInfo.value + LENGTH_SIZE, value};
+  const {value} = P_STRING_FIXED(lengthInfo.value)(bytes, start + lengthInfo.shift);
+  return {shift: lengthInfo.value + lengthInfo.shift, value};
 };
 
 export const P_BASE58_FIXED = (len: number): TParser<string> => (bytes: Uint8Array, start: number = 0) => {
@@ -63,7 +63,7 @@ export const P_BASE64 = (lenParser: TParser<number>) => (bytes: Uint8Array, star
 };
 
 const byteToString = (shift: number) => (bytes: Uint8Array, start: number) => {
-  const value = Utf8ArrayToStr(bytes.slice(start, start + shift))
+  const value = Utf8ArrayToStr(bytes.slice(start, start + shift));
   return {shift, value};
 };
 
