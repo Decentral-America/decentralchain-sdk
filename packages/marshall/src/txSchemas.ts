@@ -215,7 +215,7 @@ export namespace txFields {
     // toBytes: INT,
     // fromBytes: P_INT,
     items: new Map<string, TSchema>([
-      ['long', longField('value')],
+      ['integer', longField('value')],
       ['binary', {name: '', toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}],
       ['string', {name: '', toBytes: LEN(INT)(STRING), fromBytes: P_STRING_VAR(P_INT)}],
       [(Symbol('placeholder')) as any, {} as any],
