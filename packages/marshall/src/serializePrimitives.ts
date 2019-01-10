@@ -1,7 +1,7 @@
 import base58 from "./libs/base58";
 import * as Base64 from "base64-js"
-import * as Long from "long";
 import {concat} from "./libs/utils";
+import Long = require("long");
 
 const stringToUint8Array = (str: string) =>
   Uint8Array.from([...unescape(encodeURIComponent(str))].map(c => c.charCodeAt(0)));
