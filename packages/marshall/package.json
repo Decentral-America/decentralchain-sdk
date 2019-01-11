@@ -1,8 +1,8 @@
 {
-  "version": "0.1.5",
+  "version": "0.1.6",
   "name": "@waves/marshall",
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "prepublishOnly": "tsc"
