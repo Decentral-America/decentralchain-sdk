@@ -1,7 +1,10 @@
+import * as create from "parse-json-bignumber/dist/parse-json-bignumber";
+const {parse, stringify} = create();
 import {getTransactionSchema, ILongFactory} from "./schemas";
 import {TSchema} from "./schemaTypes";
 import {LONG} from "./serializePrimitives";
 import {convertLongFields} from "./index";
+
 
 function resolvePath(path: string[], obj: any): any{
   if (path.length === 0) return obj
@@ -152,8 +155,7 @@ export function txToJson(tx: any): string {
 }
 
 export function parseTx<LONG = string>(str: string, lf?: ILongFactory<LONG>) {
-  const safeStr = str.replace(/(".+?"[ \t\n]*:[ \t\n]*)(\d{15,})/gm, '$1"$2"');
-  let tx = JSON.parse(safeStr);
+  let tx = parse(str);
 
   //ToDo: rewrite. Now simply serializes and then parses with long  factory to get right long types
   return lf ? convertLongFields(tx, lf) : tx
