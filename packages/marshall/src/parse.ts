@@ -31,11 +31,12 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     if(schema.withLength) cursor += 2;
     const result: any = {};
     schema.schema.forEach(field => {
-      const parser = parserFromSchema(field, lf);
+      const [name, schema] = field;
+      const parser = parserFromSchema(schema, lf);
       const {value, shift} = parser(bytes, cursor);
       cursor += shift;
       if (value !== undefined) {
-        result[field.name] = value
+        result[name] = value
       }
     });
 

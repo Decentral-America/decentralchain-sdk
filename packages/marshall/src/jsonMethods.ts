@@ -20,7 +20,10 @@ const isLongProp = (fullPath: string[], fullSchema: TSchema, targetObject: any):
 
     if (path.length === 0 && (schema.type === 'primitive' || schema.type === undefined)) return schema.toBytes === LONG;
 
-    if (schema.type === 'object') return go(path.slice(1), schema.schema.find(item => item.name === path[0]));
+    if (schema.type === 'object'){
+      const field =  schema.schema.find(([name,_]) => name === path[0]);
+      return go(path.slice(1), field && field[1]) ;
+    }
 
     if (schema.type === 'array') {
       return go(path.slice(1), schema.items)

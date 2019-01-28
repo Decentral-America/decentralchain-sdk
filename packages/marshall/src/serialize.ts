@@ -1,4 +1,4 @@
-import {BYTE, LEN, SHORT, TSerializer} from "./serializePrimitives";
+import {BYTE, LEN, SHORT, STRING, TSerializer} from "./serializePrimitives";
 import {concat} from "./libs/utils";
 import {ILongFactory, orderSchemaV0, orderSchemaV2, txFields, getTransactionSchema} from "./schemas";
 import {TSchema} from "./schemaTypes";
@@ -23,8 +23,9 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
     }
 
     schema.schema.forEach(field => {
-      serializer = serializerFromSchema(field, lf);
-      itemBytes = serializer(obj[field.name]);
+      const [name, schema] = field;
+      serializer = serializerFromSchema(schema, lf);
+      itemBytes = serializer(obj[name]);
       objBytes = concat(objBytes, itemBytes);
     });
 
@@ -48,7 +49,7 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
     return schema.toBytes(obj);
   }
   else if (schema.type === 'dataTxField') {
-    const keyBytes = txFields.stringField('').toBytes(obj.key);
+    const keyBytes = LEN(SHORT)(STRING)(obj.key);
     const type = obj.type;
     const typeSchema = schema.items.get(type);
     if (typeSchema == null) {

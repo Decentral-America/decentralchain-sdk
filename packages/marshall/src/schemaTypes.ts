@@ -5,18 +5,18 @@ export enum DATA_FIELD_TYPE {
   BINARY = 'binary'
 }
 
-export type TSchema = TObject | TArray | TAnyOf | TDataTxField | TPrimitive;
+export type TSchema = TObject | TArray | TAnyOf | TDataTxItem | TPrimitive;
+
+export type TObjectField = [string, TSchema];
 
 export type TObject = {
-  name: string;
   type: 'object';
   //Objects sometimes are needed to be serialized with length
   withLength?: boolean;
   optional?: boolean;
-  schema: TSchema[];
+  schema: TObjectField[];
 }
 export type TArray = {
-  name: string;
   type: 'array';
   items: TSchema;
   toBytes?: any;
@@ -24,7 +24,6 @@ export type TArray = {
 }
 
 export type TAnyOf = {
-  name: string;
   type: 'anyOf';
   toBytes?: any;
   fromBytes?: any;
@@ -34,15 +33,13 @@ export type TAnyOf = {
 }
 
 export type TPrimitive = {
-  name: string;
   type?: 'primitive';
   toBytes: (...args: any) => any;
   fromBytes: (bytes: Uint8Array, start?: number) => any;
 }
 
 //Data tx field serializes differently. It has type AFTER key field!!!
-export type TDataTxField = {
-  name: string;
+export type TDataTxItem = {
   type: 'dataTxField';
   items: Map<DATA_FIELD_TYPE, TSchema>;
 }
