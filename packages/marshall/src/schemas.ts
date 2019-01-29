@@ -13,7 +13,17 @@ import {
   byteToScript,
   P_LONG, P_OPTION, P_BYTE, P_BASE58_FIXED, P_BASE58_VAR, P_SHORT, P_STRING_VAR, P_BASE64, P_INT
 } from './parsePrimitives'
-import {TObject, TSchema, DATA_FIELD_TYPE, TDataTxItem, TAnyOf, TArray, TPrimitive, TObjectField} from './schemaTypes'
+import {
+  TObject,
+  TSchema,
+  DATA_FIELD_TYPE,
+  TDataTxItem,
+  IAnyOf,
+  TArray,
+  TPrimitive,
+  TObjectField,
+  AnyOf
+} from './schemaTypes'
 
 
 //Todo: import this enums from ts-types package
@@ -35,6 +45,7 @@ export enum TRANSACTION_TYPE {
   SET_ASSET_SCRIPT = 15,
   CONTRACT_INVOCATION = 16
 }
+
 
 export namespace txFields {
   //Field constructors
@@ -64,7 +75,7 @@ export namespace txFields {
     fromBytes: P_BASE64(P_SHORT)
   }])
 
-  export const byteConstant = (name: string, byte: number): TObjectField => ([name, {
+  export const byteConstant = (byte: number): TObjectField => (['noname', {
     toBytes: () => Uint8Array.from([byte]),
     fromBytes: () => ({value: undefined, shift: 1})
   }]);
@@ -152,10 +163,10 @@ export namespace txFields {
   const dataTxItem: TDataTxItem = {
     type: 'dataTxField',
     items: new Map<DATA_FIELD_TYPE, TSchema>([
-      [DATA_FIELD_TYPE.INTEGER, longField('value')[1]],
-      [DATA_FIELD_TYPE.BOOLEAN, booleanField('value')[1]],
-      [DATA_FIELD_TYPE.BINARY, base64field('value')[1]],
-      [DATA_FIELD_TYPE.STRING, stringField('value')[1]]
+      [DATA_FIELD_TYPE.INTEGER, {toBytes: LONG, fromBytes: P_LONG}],
+      [DATA_FIELD_TYPE.BOOLEAN, {toBytes: BOOL, fromBytes: P_BOOLEAN}],
+      [DATA_FIELD_TYPE.BINARY, {toBytes: LEN(SHORT)(BASE64_STRING), fromBytes: P_BASE64(P_SHORT)}],
+      [DATA_FIELD_TYPE.STRING, {toBytes: LEN(SHORT)(STRING), fromBytes: P_STRING_VAR(P_SHORT)}]
     ])
   };
 
@@ -164,30 +175,37 @@ export namespace txFields {
     items: dataTxItem
   }];
 
-  const functionArgument: TAnyOf = {
-    type: 'anyOf',
-    discriminatorField: 'type',
-    // toBytes: INT,
-    // fromBytes: P_INT,
-    items: new Map<string, TSchema>([
-      ['integer', longField('value')],
-      ['binary', {name: '', toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}],
-      ['string', {name: '', toBytes: LEN(INT)(STRING), fromBytes: P_STRING_VAR(P_INT)}],
-      [(Symbol('placeholder')) as any, {} as any],
-      [(Symbol('placeholder')) as any, {} as any],
-      [(Symbol('placeholder')) as any, {} as any],
-      ['true', {name: 'true', toBytes: () => Uint8Array.from([]), fromBytes: () => ({value: true, shift: 0})}],
-      ['false', {name: 'false', toBytes: () => Uint8Array.from([]), fromBytes: () => ({value: true, shift: 0})}],
-    ])
-  };
+  const functionArgument = new AnyOf([
+    [0, {toBytes: LONG, fromBytes: P_LONG}, 'integer'],
+    [1, {toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}, 'binary'],
+    [2, {toBytes: LEN(INT)(STRING), fromBytes: P_STRING_VAR(P_INT)}, 'string'],
+    [6, {toBytes: () => Uint8Array.from([]), fromBytes: () => ({value: true, shift: 0})}, 'true'],
+    [7, {toBytes: () => Uint8Array.from([]), fromBytes: () => ({value: true, shift: 0})}, 'false'],
+  ]);
+  // const functionArgument: IAnyOf = {
+  //   type: 'anyOf',
+  //   discriminatorField: 'type',
+  //   // toBytes: INT,
+  //   // fromBytes: P_INT,
+  //   items: new Map<string, TSchema>([
+  //     ['integer', longField('value')[1]],
+  //     ['binary', { toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT)}],
+  //     ['string', { toBytes: LEN(INT)(STRING), fromBytes: P_STRING_VAR(P_INT)}],
+  //     [(Symbol('placeholder')) as any, {} as any],
+  //     [(Symbol('placeholder')) as any, {} as any],
+  //     [(Symbol('placeholder')) as any, {} as any],
+  //     ['true', {toBytes: () => Uint8Array.from([]), fromBytes: () => ({value: true, shift: 0})}],
+  //     ['false', {toBytes: () => Uint8Array.from([]), fromBytes: () => ({value: true, shift: 0})}],
+  //   ])
+  // };
 
 
   export const functionCall: TObjectField = ['call', {
     type: 'object',
     schema: [
       // special bytes to indicate function call. Used in Serde serializer
-      byteConstant('noname', 9),
-      byteConstant('noname', 1),
+      byteConstant(9),
+      byteConstant(1),
       ['function', {
         toBytes: LEN(INT)(STRING),
         fromBytes: P_STRING_VAR(P_INT)
@@ -342,6 +360,27 @@ export const exchangeSchemaV0: TSchema = {
   ]
 }
 
+export const exchangeSchemaV2: TSchema = {
+  type: 'object',
+  schema: [
+    txFields.type,
+    ['order1', new AnyOf([
+      [1, {type: 'object', schema: [txFields.byteConstant(1)], ...orderSchemaV0.schema}],
+      [2, orderSchemaV2]
+    ], {discriminatorField: 'version'})],
+    ['order2', new AnyOf([
+      [1, {type: 'object', schema: [txFields.byteConstant(1)], ...orderSchemaV0.schema}],
+      [2, orderSchemaV2]
+    ], {discriminatorField: 'version'})],
+    txFields.longField('price'),
+    txFields.longField('amount'),
+    txFields.longField('buyMatcherFee'),
+    txFields.longField('sellMatcherFee'),
+    txFields.longField('fee'),
+    txFields.longField('timestamp'),
+  ]
+}
+
 export const issueSchemaV2: TSchema = {
   type: 'object',
   schema: [
@@ -449,7 +488,7 @@ export const transferSchemaV2: TSchema = {
     txFields.version,
     txFields.senderPublicKey,
     txFields.optionalAssetId,
-    ['feeAssetId', {...txFields.optionalAssetId[1]}],
+    ['feeAssetId', txFields.optionalAssetId[1]],
     txFields.timestamp,
     txFields.amount,
     txFields.fee,
@@ -461,7 +500,7 @@ export const transferSchemaV2: TSchema = {
 export const proofsSchemaV1: TSchema = {
   type: 'object',
   schema: [
-    txFields.byteConstant('version', 1),
+    txFields.byteConstant( 1), // proofs version
     txFields.proofs
   ]
 };
@@ -485,7 +524,8 @@ export const schemasByTypeMap = {
     2: burnSchemaV2
   },
   [TRANSACTION_TYPE.EXCHANGE]: {
-    0: exchangeSchemaV0
+    0: exchangeSchemaV0,
+    2: exchangeSchemaV2
   },
   [TRANSACTION_TYPE.LEASE]: {
     2: leaseSchemaV2

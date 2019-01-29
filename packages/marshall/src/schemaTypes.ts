@@ -5,9 +5,10 @@ export enum DATA_FIELD_TYPE {
   BINARY = 'binary'
 }
 
-export type TSchema = TObject | TArray | TAnyOf | TDataTxItem | TPrimitive;
+export type TSchema = TObject | TArray | IAnyOf | TDataTxItem | TPrimitive;
 
 export type TObjectField = [string, TSchema];
+export type TAnyOfItem = {schema: TSchema, key: number, strKey?: string};
 
 export type TObject = {
   type: 'object';
@@ -23,13 +24,14 @@ export type TArray = {
   fromBytes?: any;
 }
 
-export type TAnyOf = {
+export interface IAnyOf {
   type: 'anyOf';
   toBytes?: any;
   fromBytes?: any;
-  discriminatorField?: string;
-  valueField?: string;
-  items: Map<string, TSchema>;
+  discriminatorField: string; // defaults to 'type'
+  valueField?: string; // defaults to whole object
+  itemByKey: (key: string) => TAnyOfItem | undefined
+  itemByByteKey: (key: number) => TAnyOfItem | undefined
 }
 
 export type TPrimitive = {
@@ -44,3 +46,37 @@ export type TDataTxItem = {
   items: Map<DATA_FIELD_TYPE, TSchema>;
 }
 
+export class AnyOf implements IAnyOf{
+  public type: "anyOf" = "anyOf";
+  public toBytes?: any;
+  public fromBytes?: any;
+  public discriminatorField = 'value';
+  public valueField?: string; // defaults to whole object
+
+
+  constructor(private _items: [number, TSchema, string?][], options?: any){
+    Object.assign(this, options);
+
+  }
+
+  public itemByKey(k: string): TAnyOfItem | undefined{
+    if (this._items[0] && this._items.length === 3){
+      const row =  this._items.find(([key, schema, stringKey]) => stringKey === k);
+      return row && {
+        schema: row[1],
+        key: row[0],
+        strKey: row[2]
+      }
+    }
+    return this.itemByByteKey(k as any)
+  }
+
+  public itemByByteKey(k:number):  TAnyOfItem  | undefined{
+    const row =  this._items.find(([key, _]) => key === k);
+    return row && {
+      schema: row[1],
+      key: row[0],
+      strKey: row[0].toString(10)
+    }
+  }
+}

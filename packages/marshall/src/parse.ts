@@ -27,8 +27,9 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
       if (!exists) return {value: undefined, shift: 1}
     }
 
-    //we don't need object length to parse it since we have schema of all its fields
+    // skip object length, since we have schema of all its fields
     if(schema.withLength) cursor += 2;
+
     const result: any = {};
     schema.schema.forEach(field => {
       const [name, schema] = field;
@@ -46,22 +47,25 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     const typeInfo = (schema.fromBytes || P_BYTE)(bytes, cursor);
     cursor += typeInfo.shift;
 
-    const item = Array.from(schema.items.values())[typeInfo.value];
-    const parser = parserFromSchema(item, lf);
+    const item = schema.itemByByteKey(typeInfo.value);
+    if (item == null){
+      throw new Error(`Failed to get schema for item with bytecode: ${typeInfo.value}`)
+    }
+    const parser = parserFromSchema(item.schema, lf);
     const {value, shift} = parser(bytes, cursor);
     cursor += shift;
 
-    const discriminatorField = schema.discriminatorField || 'type';
-    const discriminatorValue = [...schema.items.keys()][typeInfo.value];
-    const valueField = schema.valueField || 'value';
-
-    return  {
-      value: {
-        [discriminatorField]: discriminatorValue,
-        [valueField]: value,
-      },
-      shift: cursor - start
+    // Checks if value should be written inside object. Eg. { type: 'int', value: 20}
+    if (schema.valueField){
+      return {
+        [schema.discriminatorField]: item.strKey,
+        [schema.valueField]: value
+      }
+    // Otherwise writes object directly. Eg. {type: 4, recipient: 'foo', timestamp:10000}
+    }else {
+      return value
     }
+
   }
   else if (schema.type === 'dataTxField') {
     const key = byteToStringWithLength(bytes, cursor);
