@@ -36,13 +36,23 @@ const isLongProp = (fullPath: string[], fullSchema: TSchema, targetObject: any):
       return go( path.slice(1), dataSchema)
     }
 
-    // if (schema.type === 'anyOf'){
-    //   if (path[0] !== schema.discriminatorField || 'type'){
-    //     return false
-    //   }
-    //   const obj = resolvePath(fullPath.slice(0, fullPath.length -1), targetObject);
-    //   return go( path.slice(1), schema.items.get(obj[schema.discriminatorField || 'type']))
-    // }
+    if (schema.type === 'anyOf'){
+
+      // Find object and get it's schema
+      const obj = resolvePath(fullPath.slice(0, fullPath.length -1), targetObject);
+      const objType = obj[schema.discriminatorField];
+      const objSchema = schema.itemByKey(objType);
+      if (!objSchema) return false
+
+
+
+      if (schema.valueField != null){
+        return go(path.slice(1), objSchema.schema)
+      }else {
+        return go(path, objSchema.schema)
+      }
+
+    }
 
     return false
   }
@@ -166,9 +176,5 @@ export function parseTx<LONG = string>(str: string, lf?: ILongFactory<LONG>) {
 
 export function stringifyTx(tx: any): string {
   let txWithStrings = convertLongFields(tx);
-  //TODO: remove this when contract invocation tx is fixed
-  if (tx.type === 16) {
-    txWithStrings = tx
-  }
   return txToJson(txWithStrings)
 }

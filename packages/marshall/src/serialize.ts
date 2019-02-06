@@ -29,7 +29,10 @@ export const serializerFromSchema = <LONG = string | number>(schema: TSchema, lf
       objBytes = concat(objBytes, itemBytes);
     });
 
-    if (schema.withLength) objBytes = concat(SHORT(objBytes.length), objBytes);
+    if (schema.withLength){
+      const l = schema.withLength.toBytes(objBytes.length)
+      objBytes = concat(l, objBytes);
+    }
     if (schema.optional) objBytes = concat([1], objBytes);
 
     return objBytes

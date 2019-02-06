@@ -120,6 +120,53 @@ export const exchangeTxV0 = {
   "sellMatcherFee": 63177
 }
 
+export const exchangeTxV2 = {
+  "version": 2,
+  "type": 7,
+  "id": "5KUDbPKjAoNHTMyae9zJZpFjYFAbeSQMQ9rzgkDEEUx6",
+  "sender": "3N22UCTvst8N1i1XDvGHzyqdgmZgwDKbp44",
+  "senderPublicKey": "Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP",
+  "fee": 1,
+  "timestamp": 1526992336241,
+  "proofs": ["5NxNhjMrrH5EWjSFnVnPbanpThic6fnNL48APVAkwq19y2FpQp4tNSqoAZgboC2ykUfqQs9suwBQj6wERmsWWNqa"],
+  "order1": {
+    "version": 2,
+    "id": "EcndU4vU3SJ58KZAXJPKACvMhijTzgRjLTsuWxSWaQUK",
+    "sender": "3MthkhReCHXeaPZcWXcT3fa6ey1XWptLtwj",
+    "senderPublicKey": "BqeJY8CP3PeUDaByz57iRekVUGtLxoow4XxPvXfHynaZ",
+    "matcherPublicKey": "Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP",
+    "assetPair": {"amountAsset": null, "priceAsset": "9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy"},
+    "orderType": "buy",
+    "price": 6000000000,
+    "amount": 2,
+    "timestamp": 1526992336241,
+    "expiration": 1529584336241,
+    "matcherFee": 1,
+    "signature": "2bkuGwECMFGyFqgoHV4q7GRRWBqYmBFWpYRkzgYANR4nN2twgrNaouRiZBqiK2RJzuo9NooB9iRiuZ4hypBbUQs",
+    "proofs": ["2bkuGwECMFGyFqgoHV4q7GRRWBqYmBFWpYRkzgYANR4nN2twgrNaouRiZBqiK2RJzuo9NooB9iRiuZ4hypBbUQs"]
+  },
+  "order2": {
+    //"version": 1,
+    "id": "DS9HPBGRMJcquTb3sAGAJzi73jjMnFFSWWHfzzKK32Q7",
+    "sender": "3MswjKzUBKCD6i1w4vCosQSbC8XzzdBx1mG",
+    "senderPublicKey": "7E9Za8v8aT6EyU1sX91CVK7tWUeAetnNYDxzKZsyjyKV",
+    "matcherPublicKey": "Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP",
+    "assetPair": {"amountAsset": null, "priceAsset": "9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy"},
+    "orderType": "sell",
+    "price": 5000000000,
+    "amount": 3,
+    "timestamp": 1526992336241,
+    "expiration": 1529584336241,
+    "matcherFee": 2,
+    "signature": "2R6JfmNjEnbXAA6nt8YuCzSf1effDS4Wkz8owpCD9BdCNn864SnambTuwgLRYzzeP5CAsKHEviYKAJ2157vdr5Zq",
+    "proofs": ["2R6JfmNjEnbXAA6nt8YuCzSf1effDS4Wkz8owpCD9BdCNn864SnambTuwgLRYzzeP5CAsKHEviYKAJ2157vdr5Zq"]
+  },
+  "price": 5000000000,
+  "amount": 2,
+  "buyMatcherFee": 1,
+  "sellMatcherFee": 1
+}
+
 export const cancelLeaseTx = {
   type: 9,
   version: 2,
@@ -291,6 +338,7 @@ export const exampleTxs = {
   5: reissueTx,
   6: burnTx,
   7: exchangeTxV0,
+  70: exchangeTxV2,
   8: leaseTx,
   9: cancelLeaseTx,
   10: aliasTx,
@@ -299,7 +347,7 @@ export const exampleTxs = {
   13: setScriptTx,
   14: sponsorshipTx,
   15: setAssetScriptTx,
-  16: contractInvocationTx
+  16: contractInvocationTx,
 }
 
 

@@ -43,7 +43,15 @@ export enum TRANSACTION_TYPE {
   CONTRACT_INVOCATION = 16
 }
 
+const shortConverter = {
+  toBytes: SHORT,
+  fromBytes: P_SHORT
+};
 
+const intConverter = {
+  toBytes: INT,
+  fromBytes: P_INT
+}
 export namespace txFields {
   //Field constructors
   export const longField = (name: string): TObjectField => ([name, {toBytes: LONG, fromBytes: P_LONG}]);
@@ -202,7 +210,7 @@ export namespace txFields {
 
   export const payment: TObjectField = ['payment', {
     optional: true,
-    withLength: true,
+    withLength: shortConverter,
     type: 'object',
     schema: [
       amount,
@@ -318,18 +326,36 @@ export const dataSchemaV1: TSchema = {
   ]
 };
 
+export const proofsSchemaV0: TSchema = {
+  type: 'object',
+  schema: [
+    ['signature', {
+      toBytes: BASE58_STRING,
+      fromBytes: P_BASE58_FIXED(64)
+    }]
+  ]
+};
+
+export const proofsSchemaV1: TSchema = {
+  type: 'object',
+  schema: [
+    txFields.byteConstant( 1), // proofs version
+    txFields.proofs
+  ]
+};
+
 export const exchangeSchemaV0: TSchema = {
   type: 'object',
   schema: [
     txFields.type,
     ['order1', {
       type: 'object',
-      withLength: true,
+      withLength: intConverter,
       schema: [...orderSchemaV0.schema, txFields.signature]
     }],
     ['order2', {
       type: 'object',
-      withLength: true,
+      withLength: intConverter,
       schema: [...orderSchemaV0.schema, txFields.signature]
     }],
     txFields.longField('price'),
@@ -341,18 +367,18 @@ export const exchangeSchemaV0: TSchema = {
   ]
 }
 
+const anyOrder =  anyOf([
+  [1, {type: 'object', withLength: intConverter, schema: [txFields.byteConstant(1), ...orderSchemaV0.schema, ...proofsSchemaV0.schema]}],
+  [2, {type: 'object', withLength: intConverter, schema: [...orderSchemaV2.schema, ...proofsSchemaV1.schema]}]
+], {discriminatorField: 'version', discriminatorBytePos: 4})
+
 export const exchangeSchemaV2: TSchema = {
   type: 'object',
   schema: [
     txFields.type,
-    ['order1', anyOf([
-      [1, {type: 'object', schema: [txFields.byteConstant(1)], ...orderSchemaV0.schema}],
-      [2, orderSchemaV2]
-    ], {discriminatorField: 'version'})],
-    ['order2', anyOf([
-      [1, {type: 'object', schema: [txFields.byteConstant(1)], ...orderSchemaV0.schema}],
-      [2, orderSchemaV2]
-    ], {discriminatorField: 'version'})],
+    txFields.version,
+    ['order1', anyOrder],
+    ['order2', anyOrder],
     txFields.longField('price'),
     txFields.longField('amount'),
     txFields.longField('buyMatcherFee'),
@@ -478,13 +504,6 @@ export const transferSchemaV2: TSchema = {
   ]
 };
 
-export const proofsSchemaV1: TSchema = {
-  type: 'object',
-  schema: [
-    txFields.byteConstant( 1), // proofs version
-    txFields.proofs
-  ]
-};
 
 /**
  * Maps transaction types to schemas object. Schemas are written by keys. 0 - no version, n - version n

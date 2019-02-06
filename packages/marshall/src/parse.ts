@@ -28,7 +28,10 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     }
 
     // skip object length, since we have schema of all its fields
-    if (schema.withLength) cursor += 2;
+    if (schema.withLength) {
+      const lenInfo = schema.withLength.fromBytes(bytes, cursor);
+      cursor += lenInfo.shift;
+    };
 
     const result: any = {};
     schema.schema.forEach(field => {
@@ -44,8 +47,13 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     return {value: result, shift: cursor - start}
   }
   else if (schema.type === 'anyOf') {
-    const typeInfo = (schema.fromBytes || P_BYTE)(bytes, cursor);
-    cursor += typeInfo.shift;
+    const typeInfo = (schema.fromBytes || P_BYTE)(bytes, cursor + schema.discriminatorBytePos);
+
+    // Не увеличивать курсор, если объект пишется целиком с дискриминатором или дискриминатор не на 0 позиции.
+    // Стоит убрать запись и чтение дискриминаторов из anyOf и вынес
+    if (schema.valueField && schema.discriminatorBytePos === 0){
+      cursor += typeInfo.shift;
+    }
 
     const item = schema.itemByByteKey(typeInfo.value);
     if (item == null) {
