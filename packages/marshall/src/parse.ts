@@ -21,44 +21,54 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, lf?: ILongFacto
     return {value: result, shift: cursor - start}
   }
   else if (schema.type === 'object') {
-    if(schema.optional){
+    if (schema.optional) {
       const exists = bytes[cursor] === 1;
-      cursor +=1;
+      cursor += 1;
       if (!exists) return {value: undefined, shift: 1}
     }
 
-    //we don't need object length to parse it since we have schema of all its fields
-    if(schema.withLength) cursor += 2;
+    // skip object length, since we have schema of all its fields
+    if (schema.withLength) {
+      const lenInfo = schema.withLength.fromBytes(bytes, cursor);
+      cursor += lenInfo.shift;
+    };
+
     const result: any = {};
     schema.schema.forEach(field => {
-      const parser = parserFromSchema(field, lf);
+      const [name, schema] = field;
+      const parser = parserFromSchema(schema, lf);
       const {value, shift} = parser(bytes, cursor);
       cursor += shift;
       if (value !== undefined) {
-        result[field.name] = value
+        result[name] = value
       }
     });
 
     return {value: result, shift: cursor - start}
   }
   else if (schema.type === 'anyOf') {
-    const typeInfo = (schema.fromBytes || P_BYTE)(bytes, cursor);
-    cursor += typeInfo.shift;
+    const typeInfo = (schema.fromBytes || P_BYTE)(bytes, cursor + schema.discriminatorBytePos);
 
-    const item = Array.from(schema.items.values())[typeInfo.value];
-    const parser = parserFromSchema(item, lf);
+    // Не увеличивать курсор, если объект пишется целиком с дискриминатором или дискриминатор не на 0 позиции.
+    // Стоит убрать запись и чтение дискриминаторов из anyOf и вынес
+    if (schema.valueField && schema.discriminatorBytePos === 0){
+      cursor += typeInfo.shift;
+    }
+
+    const item = schema.itemByByteKey(typeInfo.value);
+    if (item == null) {
+      throw new Error(`Failed to get schema for item with bytecode: ${typeInfo.value}`)
+    }
+    const parser = parserFromSchema(item.schema, lf);
     const {value, shift} = parser(bytes, cursor);
     cursor += shift;
 
-    const discriminatorField = schema.discriminatorField || 'type';
-    const discriminatorValue = [...schema.items.keys()][typeInfo.value];
-    const valueField = schema.valueField || 'value';
 
-    return  {
-      value: {
-        [discriminatorField]: discriminatorValue,
-        [valueField]: value,
-      },
+    return {
+      // Checks if value should be written inside object. Eg. { type: 'int', value: 20}. Otherwise writes object directly. Eg. {type: 4, recipient: 'foo', timestamp:10000}
+      value: schema.valueField ?
+        {[schema.discriminatorField]: item.strKey, [schema.valueField]: value} :
+        value,
       shift: cursor - start
     }
   }

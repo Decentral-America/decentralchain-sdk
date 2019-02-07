@@ -120,6 +120,55 @@ export const exchangeTxV0 = {
   "sellMatcherFee": 63177
 }
 
+export const exchangeTxV2 = {
+  "version": 2,
+  "type": 7,
+  "id": "5KUDbPKjAoNHTMyae9zJZpFjYFAbeSQMQ9rzgkDEEUx6",
+  "sender": "3N22UCTvst8N1i1XDvGHzyqdgmZgwDKbp44",
+  "senderPublicKey": "Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP",
+  "fee": 1,
+  "timestamp": 1526992336241,
+  "proofs": ["5NxNhjMrrH5EWjSFnVnPbanpThic6fnNL48APVAkwq19y2FpQp4tNSqoAZgboC2ykUfqQs9suwBQj6wERmsWWNqa"],
+  "order1": {
+    "version": 2,
+    "id": "EcndU4vU3SJ58KZAXJPKACvMhijTzgRjLTsuWxSWaQUK",
+    "sender": "3MthkhReCHXeaPZcWXcT3fa6ey1XWptLtwj",
+    "senderPublicKey": "BqeJY8CP3PeUDaByz57iRekVUGtLxoow4XxPvXfHynaZ",
+    "matcherPublicKey": "Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP",
+    "assetPair": {"amountAsset": null, "priceAsset": "9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy"},
+    "orderType": "buy",
+    "price": 6000000000,
+    "amount": 2,
+    "timestamp": 1526992336241,
+    "expiration": 1529584336241,
+    "matcherFee": 1,
+    "signature": "2bkuGwECMFGyFqgoHV4q7GRRWBqYmBFWpYRkzgYANR4nN2twgrNaouRiZBqiK2RJzuo9NooB9iRiuZ4hypBbUQs",
+    "proofs": ["2bkuGwECMFGyFqgoHV4q7GRRWBqYmBFWpYRkzgYANR4nN2twgrNaouRiZBqiK2RJzuo9NooB9iRiuZ4hypBbUQs"]
+  },
+  "order2": {
+    //"version": 1,
+    "id": "DS9HPBGRMJcquTb3sAGAJzi73jjMnFFSWWHfzzKK32Q7",
+    "sender": "3MswjKzUBKCD6i1w4vCosQSbC8XzzdBx1mG",
+    "senderPublicKey": "7E9Za8v8aT6EyU1sX91CVK7tWUeAetnNYDxzKZsyjyKV",
+    "matcherPublicKey": "Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP",
+    "assetPair": {"amountAsset": null, "priceAsset": "9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy"},
+    "orderType": "sell",
+    "price": 5000000000,
+    "amount": 3,
+    "timestamp": 1526992336241,
+    "expiration": 1529584336241,
+    "matcherFee": 2,
+    "signature": "2R6JfmNjEnbXAA6nt8YuCzSf1effDS4Wkz8owpCD9BdCNn864SnambTuwgLRYzzeP5CAsKHEviYKAJ2157vdr5Zq",
+    "proofs": ["2R6JfmNjEnbXAA6nt8YuCzSf1effDS4Wkz8owpCD9BdCNn864SnambTuwgLRYzzeP5CAsKHEviYKAJ2157vdr5Zq"]
+  },
+  "price": 5000000000,
+  "amount": 2,
+  "buyMatcherFee": 1,
+  "sellMatcherFee": 1
+}
+
+export const exchangeV2BytesStr = '7,2,0,0,0,209,2,161,10,237,14,203,169,142,130,92,154,126,238,202,86,118,94,22,127,191,0,125,129,37,195,151,38,180,155,237,38,122,110,221,200,26,48,21,185,128,98,143,32,77,48,195,225,64,6,38,71,29,233,46,130,113,2,34,146,244,139,17,118,103,22,0,1,127,30,59,255,0,111,253,127,128,253,177,160,244,0,135,101,250,255,44,128,128,255,1,255,1,127,128,127,255,255,1,0,0,0,0,0,1,101,160,188,0,0,0,0,0,0,0,0,2,0,0,1,99,135,213,245,113,0,0,1,100,34,84,189,113,0,0,0,0,0,0,0,1,1,0,1,0,64,1,97,15,60,53,183,125,237,112,176,114,5,46,105,91,186,159,100,87,62,196,252,24,218,17,118,201,46,27,46,229,45,43,36,124,145,118,13,56,31,202,63,174,20,141,50,48,136,97,60,6,223,29,73,85,36,251,90,210,93,62,74,57,132,0,0,0,204,1,92,132,90,73,47,4,66,220,36,54,210,252,111,248,17,53,234,43,3,3,253,233,92,115,168,252,187,138,3,16,79,96,221,200,26,48,21,185,128,98,143,32,77,48,195,225,64,6,38,71,29,233,46,130,113,2,34,146,244,139,17,118,103,22,0,1,127,30,59,255,0,111,253,127,128,253,177,160,244,0,135,101,250,255,44,128,128,255,1,255,1,127,128,127,255,255,1,0,1,0,0,0,1,42,5,242,0,0,0,0,0,0,0,0,3,0,0,1,99,135,213,245,113,0,0,1,100,34,84,189,113,0,0,0,0,0,0,0,2,70,202,229,24,87,204,14,18,182,30,201,4,115,25,125,155,97,200,220,187,248,2,56,8,183,197,147,152,133,128,136,64,75,110,49,72,225,212,121,180,158,34,214,183,51,58,211,254,32,251,165,114,84,123,25,90,158,227,67,170,73,230,35,136,0,0,0,1,42,5,242,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,99,135,213,245,113';
+
 export const cancelLeaseTx = {
   type: 9,
   version: 2,
@@ -291,6 +340,7 @@ export const exampleTxs = {
   5: reissueTx,
   6: burnTx,
   7: exchangeTxV0,
+  70: exchangeTxV2,
   8: leaseTx,
   9: cancelLeaseTx,
   10: aliasTx,
@@ -299,7 +349,11 @@ export const exampleTxs = {
   13: setScriptTx,
   14: sponsorshipTx,
   15: setAssetScriptTx,
-  16: contractInvocationTx
+  16: contractInvocationTx,
+}
+
+export const exampleBytesStr = {
+  70: exchangeV2BytesStr
 }
 
 
