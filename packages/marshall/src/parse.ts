@@ -38,7 +38,8 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, toLongConverter
     if (schema.withLength) {
       const lenInfo = schema.withLength.fromBytes(bytes, cursor);
       cursor += lenInfo.shift;
-    };
+    }
+    ;
 
     const result: any = {};
     schema.schema.forEach(field => {
@@ -47,7 +48,12 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, toLongConverter
       const {value, shift} = parser(bytes, cursor);
       cursor += shift;
       if (value !== undefined) {
-        result[name] = value
+        // Name as array means than we need to save result to many object fields
+        if (Array.isArray(name)) {
+          Object.assign(result, value)
+        } else {
+          result[name] = value
+        }
       }
     });
 
@@ -58,7 +64,7 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, toLongConverter
 
     // Не увеличивать курсор, если объект пишется целиком с дискриминатором или дискриминатор не на 0 позиции.
     // Стоит убрать запись и чтение дискриминаторов из anyOf и вынес
-    if (schema.valueField && schema.discriminatorBytePos === 0){
+    if (schema.valueField && schema.discriminatorBytePos === 0) {
       cursor += typeInfo.shift;
     }
 
@@ -114,10 +120,23 @@ export const parserFromSchema = <LONG = string>(schema: TSchema, toLongConverter
   }
 };
 
-export const parseHeader = (bytes: Uint8Array): { type: number, version: number } => ({
-  type: P_BYTE(bytes).value,
-  version: P_BYTE(bytes, 1).value
-});
+export const parseHeader = (bytes: Uint8Array): { type: number, version: number } => {
+  let shift = 0;
+  let typeInfo = P_BYTE(bytes, shift);
+  shift += typeInfo.shift;
+
+  // ExchangeTransactionV2 have leading 0 in bodybytes
+  if (typeInfo.value === 0) {
+    typeInfo = P_BYTE(bytes, shift)
+    shift += typeInfo.shift
+  }
+  let versionInfo =  P_BYTE(bytes, shift);
+
+  return {
+    type: typeInfo.value,
+    version: versionInfo.value
+  }
+};
 
 /**
  * This function cannot parse transactions without version

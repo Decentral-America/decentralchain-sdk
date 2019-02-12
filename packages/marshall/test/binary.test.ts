@@ -58,10 +58,11 @@ describe('Tx serialize/parse', ()=> {
     expect(parsed.timestamp).toBeInstanceOf(BigNumber)
   })
 
-  it('Should correctly serialize exchangeV2', () => {
-    const tx = exampleTxs[70];
-    const bytesStr = exampleBytesStr[70]
-    const bytes = binary.serializeTx(tx).toString()
-    expect(bytesStr).toEqual(bytes.toString())
+  it('Should get exact bytes for transactions', () => {
+    Object.entries(exampleBytesStr).forEach(([type, bytesStr]) => {
+      const tx = (exampleTxs as any)[type]
+      const bytes = binary.serializeTx(tx).toString()
+      expect(bytesStr).toEqual(bytes.toString())
+    })
   })
 })
