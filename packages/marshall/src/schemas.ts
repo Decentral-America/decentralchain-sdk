@@ -211,6 +211,12 @@ export namespace txFields {
   export const payment: TObject = {
     type: 'object',
     schema: [
+      byteConstant(0),
+      byteConstant(9),
+      // ['assetId', {
+      //   toBytes: (assetId: any) => Uint8Array.from([assetId ? 43 : 9]),
+      //   fromBytes: () => ({ value: undefined, shift: 1 }),
+      // }],
       amount,
       ['assetId', {
         toBytes: OPTION(LEN(SHORT)(BASE58_STRING)),
@@ -219,7 +225,7 @@ export namespace txFields {
     ],
   }
 
-  export const payments: TObjectField = ['transfers', {
+  export const payments: TObjectField = ['payment', {
     type: 'array',
     items: payment,
   }]
@@ -320,7 +326,7 @@ export const invokeScriptSchemaV1: TSchema = {
     txFields.functionCall,
     txFields.payments,
     txFields.fee,
-    txFields.optionalAssetId,
+    ['feeAssetId', txFields.optionalAssetId[1]],
     txFields.timestamp,
   ],
 }
