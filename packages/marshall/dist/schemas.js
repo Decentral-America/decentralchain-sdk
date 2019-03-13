@@ -156,7 +156,11 @@ var txFields;
         schema: [
             txFields.byteConstant(0),
             ['assetId', {
-                    toBytes: (assetId) => Uint8Array.from([assetId ? 43 : 9]),
+                    toBytes: (assetId) => {
+                        console.log('AHTUNG!');
+                        console.log(assetId);
+                        return Uint8Array.from([assetId ? 43 : 9]);
+                    },
                     fromBytes: () => ({ value: undefined, shift: 1 }),
                 }],
             txFields.amount,
