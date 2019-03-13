@@ -213,11 +213,7 @@ export namespace txFields {
     schema: [
       byteConstant(0),
       ['assetId', {
-        toBytes: (assetId: any) => {
-          console.log('V2!')
-          console.log(assetId)
-          return Uint8Array.from([assetId ? BASE58_STRING(assetId).length + 11 : 9])
-        },
+        toBytes: (assetId: any) => Uint8Array.from([assetId ? BASE58_STRING(assetId).length + 11 : 9]),
         fromBytes: () => ({ value: undefined, shift: 1 }),
       }],
       amount,
