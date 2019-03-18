@@ -135,7 +135,7 @@ export const exchangeTxV2 = {
     // "sender": "3MthkhReCHXeaPZcWXcT3fa6ey1XWptLtwj",
     'senderPublicKey': 'BqeJY8CP3PeUDaByz57iRekVUGtLxoow4XxPvXfHynaZ',
     'matcherPublicKey': 'Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP',
-    'assetPair': { 'amountAsset': null, 'priceAsset': '9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy' },
+    'assetPair': {'amountAsset': null, 'priceAsset': '9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy'},
     'orderType': 'buy',
     'price': 6000000000,
     'amount': 2,
@@ -151,7 +151,7 @@ export const exchangeTxV2 = {
     //"sender": "3MswjKzUBKCD6i1w4vCosQSbC8XzzdBx1mG",
     'senderPublicKey': '7E9Za8v8aT6EyU1sX91CVK7tWUeAetnNYDxzKZsyjyKV',
     'matcherPublicKey': 'Fvk5DXmfyWVZqQVBowUBMwYtRAHDtdyZNNeRrwSjt6KP',
-    'assetPair': { 'amountAsset': null, 'priceAsset': '9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy' },
+    'assetPair': {'amountAsset': null, 'priceAsset': '9ZDWzK53XT5bixkmMwTJi2YzgxCqn5dUajXFcT2HcFDy'},
     'orderType': 'sell',
     'price': 5000000000,
     'amount': 3,
@@ -210,8 +210,8 @@ export const massTransferTx = {
     ['2Un2WpTiFBdhhh7nXd99ci3gAqonuz4xBkWrDS1MJ5fUo9AW12aiYXi3KvnRrmt3C7HqE3BrokzAnYAckd3ggu7D'],
   id: '7mEAv8DgVgo9xgg4nSMNBeFjuKUsnnqanQgqFw2VEKmG',
   transfers: [
-    { recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000 },
-    { recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000 },
+    {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000},
+    {recipient: '3N3Cn2pYtqzj7N9pviSesNe8KG9Cmb718Y1', amount: 10000},
   ],
   attachment: 'aAaABbbBB43CcccffrrRRxxVVggFFrrEEwwZZyyYY22335511224422LL',
 }
@@ -226,10 +226,10 @@ export const dataTx = {
     ['5AMn7DEwZ6VvDLkJNdP5EW1PPJQKeWjy8qp5HoCGWaWWEPYdr1Ewkqor6NfLPDrGQdHd5DFUoE7CtwSrfAUMKLAY'],
   id: 'F7fkrYuJAsJfJRucwty7dcBoMS95xBufxBi7AXqCFgXg',
   data: [
-    { type: 'binary', key: 'aspen', value: 'base64:AQIDBA==' },
-    { type: 'binary', key: 'brittany', value: 'base64:YXNkYQ==' },
-    { type: 'boolean', key: 'charlie', value: true },
-    { type: 'integer', key: 'douglas', value: 1000 },
+    {type: 'binary', key: 'aspen', value: 'base64:AQIDBA=='},
+    {type: 'binary', key: 'brittany', value: 'base64:YXNkYQ=='},
+    {type: 'boolean', key: 'charlie', value: true},
+    {type: 'integer', key: 'douglas', value: 1000},
   ],
 }
 
@@ -286,12 +286,15 @@ export const invokeScriptTx = {
         'type': 'binary',
         'value': 'base64:YWxpY2U=',
       },
+      {type: "integer", value: 600000000},
+      {type: "boolean", value: false},
+      {type: "boolean", value: true}
     ],
   },
-  'payment': {
+  'payment': [{
     'amount': 7,
     'assetId': '73pu8pHFNpj9tmWuYjqnZ962tXzJvLGX86dxjZxGYhoK',
-  },
+  }],
   'fee': 100000,
   'timestamp': 1545307831159,
   'chainId': 68,
@@ -304,10 +307,10 @@ export const invokeScriptTx = {
 export const orderV0 = {
   orderType: 'buy',
   assetPair:
-  {
-    amountAsset: null,
-    priceAsset: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
-  },
+    {
+      amountAsset: null,
+      priceAsset: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
+    },
   price: 10,
   amount: 100000000,
   timestamp: 1544102345137,
@@ -324,10 +327,10 @@ export const orderV2 = {
   orderType: 'buy',
   version: 2,
   assetPair:
-  {
-    amountAsset: null,
-    priceAsset: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
-  },
+    {
+      amountAsset: null,
+      priceAsset: '8LQW8f7P5d5PZM7GtZEBgaqRPGSzS3DfPuiXrURJ4AJS',
+    },
   price: 10,
   amount: 100000000,
   timestamp: 1544102345137,

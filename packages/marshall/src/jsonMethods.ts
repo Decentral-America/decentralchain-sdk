@@ -47,9 +47,13 @@ const isLongProp = (fullPath: string[], fullSchema: TSchema | undefined, targetO
       if (!objSchema) return false
 
 
-      if (schema.valueField != null) {
+      // If valueField exists in schema we also check if value and not type field is currently processed. E.g:
+      // {type: 'integer', value: 1000}
+      if (schema.valueField != null && fullPath[fullPath.length - 1] === schema.valueField) {
         return go(path.slice(1), objSchema.schema)
-      } else {
+      }
+      //  Otherwise whole object is used as value. E.g.: {type:14, sender: 'example', amount: 1000}
+      else {
         return go(path, objSchema.schema)
       }
 
@@ -75,6 +79,14 @@ export function stringifyWithSchema(obj: any, schema?: TSchema): string {
   function stringifyValue(value: any): string | undefined {
 
     if (typeof value === 'string') {
+
+      // ///TODO: DIRTY HACK
+      // if (value === 'integer'
+      //   && path[0] === 'call'
+      //   && path[1] === 'args'
+      //   && path[3] === 'type'
+      // ) { return `"${value}"` }
+
       if (isLongProp(path, schema, obj)) {
         return value
       }

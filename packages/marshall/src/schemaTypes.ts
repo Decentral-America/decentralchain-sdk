@@ -41,14 +41,18 @@ export type TPrimitive = {
   fromBytes: (bytes: Uint8Array, start?: number) => any;
 }
 
-//Data tx field serializes differently. It has type AFTER key field!!!
+// Data tx field serializes differently. It has type AFTER key field!!!
 export type TDataTxItem = {
   type: 'dataTxField';
   items: Map<DATA_FIELD_TYPE, TSchema>;
 }
 
-export function anyOf(items: [number, TSchema, string?][], options?: any): IAnyOf {
+export function anyOf(items: [number, TSchema, string?][], options?: TAnyOfOptions): IAnyOf {
   return new AnyOfClass(items, options)
+}
+
+export type TAnyOfOptions = {
+  [P in Exclude<keyof AnyOfClass, 'type'>]?:  AnyOfClass[P]
 }
 
 class AnyOfClass implements IAnyOf {
@@ -61,13 +65,12 @@ class AnyOfClass implements IAnyOf {
   public valueField?: string // defaults to whole object
 
 
-  constructor(private _items: [number, TSchema, string?][], options?: any) {
+  constructor(private _items: [number, TSchema, string?][], options?: TAnyOfOptions) {
     Object.assign(this, options)
-
   }
 
   public itemByKey(k: string): TAnyOfItem | undefined {
-    // Here if k equals undefined (this happens of discriminator field is undefined), first item with no string key returns
+    // Here if k equals undefined (this happens if discriminator field is undefined), first item with no string key returns
     // This is useful for items without versions. E.g. orderV0
     const row = this._items.find(([key, schema, stringKey]) => stringKey === k || key == k as any)
     return row && {

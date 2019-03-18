@@ -184,8 +184,8 @@ export namespace txFields {
     [0, { toBytes: LONG, fromBytes: P_LONG }, 'integer'],
     [1, { toBytes: LEN(INT)(BASE64_STRING), fromBytes: P_BASE64(P_INT) }, 'binary'],
     [2, { toBytes: LEN(INT)(STRING), fromBytes: P_STRING_VAR(P_INT) }, 'string'],
-    [6, { toBytes: () => Uint8Array.from([]), fromBytes: () => ({ value: true, shift: 0 }) }, 'true'],
-    [7, { toBytes: () => Uint8Array.from([]), fromBytes: () => ({ value: false, shift: 0 }) }, 'false'],
+    [6, { toBytes: () => Uint8Array.from([]), fromBytes: () => ({ value: true, shift: 0 }) }, 'boolean'],
+    [7, { toBytes: () => Uint8Array.from([]), fromBytes: () => ({ value: false, shift: 0 }) }, 'boolean'],
   ], { valueField: 'value' })
 
 
@@ -210,12 +210,8 @@ export namespace txFields {
 
   export const payment: TObject = {
     type: 'object',
+    withLength: shortConverter,
     schema: [
-      byteConstant(0),
-      ['assetId', {
-        toBytes: (assetId: any) => Uint8Array.from([assetId ? BASE58_STRING(assetId).length + 11 : 9]),
-        fromBytes: () => ({ value: undefined, shift: 1 }),
-      }],
       amount,
       ['assetId', {
         toBytes: OPTION(LEN(SHORT)(BASE58_STRING)),
