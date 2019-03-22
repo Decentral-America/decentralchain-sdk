@@ -278,7 +278,7 @@ export const invokeScriptTx = {
   'type': 16,
   'version': 1,
   'senderPublicKey': 'DguumUPw2zHh91WpaGWMsGvkJY1gFKJhjEBMBrV4NSG4',
-  'contractAddress': '3Fb641A9hWy63K18KsBJwns64McmdEATgJd',
+  'dappAddress': '3Fb641A9hWy63K18KsBJwns64McmdEATgJd',
   'call': {
     'function': 'foo',
     'args': [

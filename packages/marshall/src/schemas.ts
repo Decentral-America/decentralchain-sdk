@@ -314,7 +314,7 @@ export const invokeScriptSchemaV1: TSchema = {
     txFields.version,
     txFields.chainId,
     txFields.senderPublicKey,
-    ['contractAddress', {
+    ['dappAddress', {
       toBytes: BASE58_STRING,
       fromBytes: P_BASE58_FIXED(26),
     }],
