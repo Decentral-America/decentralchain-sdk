@@ -8,6 +8,10 @@
     "test": "jest",
     "prepublishOnly": "tsc && webpack --config webpack.config.js --env"
   },
+  "files": [
+    "/src",
+    "/dist"
+  ],
   "author": "Wavesplatform",
   "contributors": [
     {
