@@ -67,3 +67,14 @@ export const LONG: TSerializer<number | string> = (value: number | string) => {
 }
 
 export const SCRIPT: TSerializer<string | null> = (script) => OPTION(LEN(SHORT)(BASE64_STRING))(script ? script.slice(7) : null)
+
+export const ALIAS: TSerializer<string> = val => {
+  const [_, byte, alias] = val.split(':');
+  if (!byte || byte.length !== 1) throw new Error('Invalid network byte in alias')
+  if (!alias || alias.length === 0) throw new Error('Invalid alias body')
+  return concat([2], [byte.charCodeAt(0)], LEN(SHORT)(STRING)(alias))
+}
+
+export const ADDRESS_OR_ALIAS: TSerializer<string> = val => val.startsWith('alias')
+  ? ALIAS(val)
+  : BASE58_STRING(val)

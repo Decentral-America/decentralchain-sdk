@@ -22,7 +22,10 @@ export const P_BYTE: TParser<number> = (bytes, start = 0) => ({value: bytes[star
 
 export const P_SHORT: TParser<number> = (bytes, start = 0) => ({value: 256 * bytes[start] + bytes[start + 1], shift: 2})
 
-export const P_INT: TParser<number> = (bytes, start = 0) => ({value: 2**24 * bytes[start] + 2**16 * bytes[start + 1] +  2**8 * bytes[start + 2] +  bytes[start + 3], shift: 4})
+export const P_INT: TParser<number> = (bytes, start = 0) => ({
+  value: 2 ** 24 * bytes[start] + 2 ** 16 * bytes[start + 1] + 2 ** 8 * bytes[start + 2] + bytes[start + 3],
+  shift: 4
+})
 
 export const P_LONG: TParser<string> = (bytes, start = 0) => ({
   value: Long.fromBytesBE(Array.from(bytes.slice(start, start + 8))).toString(),
@@ -87,7 +90,7 @@ export const byteToBase58WithLength = (bytes: Uint8Array, start: number = 0) => 
 export const byteToAddressOrAlias = (bytes: Uint8Array, start: number = 0) => {
   if (bytes[start] === ALIAS_VERSION) {
     const aliasData = byteToStringWithLength(bytes, start + 2)
-    return {shift: aliasData.shift + 2, value: aliasData.value}
+    return {shift: aliasData.shift + 2, value: `alias:${String.fromCharCode(bytes[start + 1])}:${aliasData.value}`}
   } else {
     return byteToBase58(bytes, start, 26)
   }

@@ -1,4 +1,5 @@
 import {
+  ADDRESS_OR_ALIAS,
   BASE58_STRING, BASE64_STRING,
   BOOL,
   BYTE, INT,
@@ -120,7 +121,7 @@ export namespace txFields {
   export const reissuable = booleanField('reissuable')
 
   export const recipient: TObjectField = ['recipient', {
-    toBytes: BASE58_STRING, //ToDo: add alias
+    toBytes: ADDRESS_OR_ALIAS,
     fromBytes: byteToAddressOrAlias,
   }]
 
@@ -312,10 +313,7 @@ export const invokeScriptSchemaV1: TSchema = {
     txFields.version,
     txFields.chainId,
     txFields.senderPublicKey,
-    ['dappAddress', {
-      toBytes: BASE58_STRING,
-      fromBytes: P_BASE58_FIXED(26),
-    }],
+    ['dappAddress', txFields.recipient[1]],
     txFields.functionCall,
     txFields.payments,
     txFields.fee,

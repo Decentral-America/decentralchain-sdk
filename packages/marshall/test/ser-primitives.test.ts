@@ -1,4 +1,21 @@
-import { LONG, SHORT, BYTE, BYTES, STRING, INT, BOOL, OPTION, COUNT, LEN, BASE58_STRING, BASE64_STRING, one, zero } from '../src/serializePrimitives';
+import {
+  LONG,
+  SHORT,
+  BYTE,
+  BYTES,
+  STRING,
+  INT,
+  BOOL,
+  OPTION,
+  COUNT,
+  LEN,
+  BASE58_STRING,
+  BASE64_STRING,
+  one,
+  zero,
+  ADDRESS_OR_ALIAS
+} from '../src/serializePrimitives'
+import {byteToAddressOrAlias} from '../src/parsePrimitives'
 
 const string = 'TestString'
 const bytes = [84, 101, 115, 116, 83, 116, 114, 105, 110, 103]
@@ -61,5 +78,10 @@ describe('Basic serialization', ()=> {
 
   it('BASE64_STRING', () => {
     expect(BASE64_STRING(base64)).toEqual(Uint8Array.from(bytes))
+  })
+
+  it('ALIAS', () => {
+    const alias = 'alias:W:example'
+    expect(byteToAddressOrAlias(ADDRESS_OR_ALIAS(alias)).value).toEqual(alias)
   })
 })
