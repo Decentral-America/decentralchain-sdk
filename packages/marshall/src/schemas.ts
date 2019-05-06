@@ -313,7 +313,7 @@ export const invokeScriptSchemaV1: TSchema = {
     txFields.version,
     txFields.chainId,
     txFields.senderPublicKey,
-    ['dappAddress', txFields.recipient[1]],
+    ['dApp', txFields.recipient[1]],
     txFields.functionCall,
     txFields.payments,
     txFields.fee,
