@@ -58,6 +58,20 @@ describe('Tx serialize/parse', ()=> {
     expect(parsed.timestamp).toBeInstanceOf(BigNumber)
   })
 
+  it('Should accept WAVES as assetId', ()=>{
+    const tx = {...exampleTxs[4], assetId: 'WAVES', feeAssetId: 'WAVES'}
+    const bytes = binary.serializeTx(tx)
+    const parsed = binary.parseTx(bytes, parseInt)
+    // delete non serializable fields. Should write typesafe excludeKeys function instead
+    delete (tx as any).proofs
+    delete (tx as any).signature
+    delete (tx as any).sender
+    delete (tx as any).id
+    delete (tx as any).assetId
+    delete (tx as any).feeAssetId
+    expect(parsed).toMatchObject(tx)
+  })
+
   it('Should get exact bytes for transactions', () => {
     Object.entries(exampleBytesStr).forEach(([type, bytesStr]) => {
       const tx = (exampleTxs as any)[type]
