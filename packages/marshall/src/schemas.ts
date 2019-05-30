@@ -20,7 +20,7 @@ import {
   DATA_FIELD_TYPE,
   TDataTxItem,
   TObjectField,
-  anyOf
+  anyOf, TPrimitive
 } from './schemaTypes'
 import {serializerFromSchema} from './serialize'
 
@@ -389,7 +389,14 @@ export const exchangeSchemaV1: TSchema = {
 const anyOrder = anyOf([
   [1, {
     type: 'object',
-    withLength: intConverter,
+    //order v1 length is serialized without orderVersion
+    withLength: {
+      toBytes: (x) => INT(x - 1),
+      fromBytes: (x) => {
+        const {value, shift} = P_INT(x)
+        return {value: value + 1, shift}
+      }
+    } as TPrimitive,
     schema: [txFields.byteConstant(1), ...orderSchemaV0.schema, ...proofsSchemaV0.schema]
   }],
   [2, {type: 'object', withLength: intConverter, schema: [...orderSchemaV2.schema, ...proofsSchemaV1.schema]}],
