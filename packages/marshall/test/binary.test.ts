@@ -3,7 +3,7 @@ import {exampleBytesStr, exampleTxs, orderV0, orderV2} from './exampleTxs'
 import Long = require('long')
 import BigNumber from 'bignumber.js'
 import {parserFromSchema} from '../src/parse'
-import {orderSchemaV0} from '../src/schemas'
+import {orderSchemaV1} from '../src/schemas'
 
 describe('Tx serialize/parse', ()=> {
   Object.entries(exampleTxs).forEach(([type, tx]) => {
@@ -21,7 +21,7 @@ describe('Tx serialize/parse', ()=> {
 
   it('Should correctly serialize old order', ()=>{
     const bytes = binary.serializeOrder(orderV0)
-    const parsed = parserFromSchema<number>(orderSchemaV0, parseInt)(bytes).value
+    const parsed = parserFromSchema<number>(orderSchemaV1, parseInt)(bytes).value
     expect(orderV0).toMatchObject(parsed)
   })
 

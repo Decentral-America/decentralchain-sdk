@@ -35,7 +35,7 @@ describe('All tx json to and from', ()=>{
   Object.entries(exampleTxs).forEach(([type, tx]) => {
     it(`Type: ${type}. toJSON, fromJSON`, () => {
       const str = json.stringifyTx(tx);
-      const parsed = json.parseTx(str)
+      const parsed = json.parseTx(str, parseInt)
       expect(parsed).toMatchObject(tx)
     })
   });

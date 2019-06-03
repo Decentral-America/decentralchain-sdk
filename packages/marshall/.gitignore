@@ -119,4 +119,4 @@ typings/
 usage
 dist
 .idea
-test/sandbox.test.ts
+test/sandbox.spec.ts

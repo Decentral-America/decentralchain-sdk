@@ -1,7 +1,7 @@
 import * as create from 'parse-json-bignumber/dist/parse-json-bignumber'
 
 const {parse, stringify} = create()
-import {getTransactionSchema, orderSchemaV0, orderSchemaV2} from './schemas'
+import {getTransactionSchema, orderSchemaV1, orderSchemaV2} from './schemas'
 import {TSchema} from './schemaTypes'
 import {LONG} from './serializePrimitives'
 import {convertLongFields, convertTxLongFields} from './index'
@@ -213,7 +213,7 @@ export function stringifyTx<LONG>(tx: any, fromLongConverter?: TFromLongConverte
  */
 export function parseOrder<LONG = string>(str: string, toLongConverter?: TToLongConverter<LONG>) {
   const ord = parse(str)
-  const schema = ord.version === 2 ? orderSchemaV2 : orderSchemaV0
+  const schema = ord.version === 2 ? orderSchemaV2 : orderSchemaV1
   return toLongConverter ? convertLongFields(ord, schema, toLongConverter) : ord
 }
 
@@ -224,7 +224,7 @@ export function parseOrder<LONG = string>(str: string, toLongConverter?: TToLong
  * @param fromLongConverter
  */
 export function stringifyOrder<LONG>(ord: any, fromLongConverter?: TFromLongConverter<LONG>): string {
-  const schema = ord.version === 2 ? orderSchemaV2 : orderSchemaV0
+  const schema = ord.version === 2 ? orderSchemaV2 : orderSchemaV1
   const ordWithStrings = convertLongFields(ord, schema, undefined, fromLongConverter)
   return stringifyWithSchema(ordWithStrings, schema)
 }

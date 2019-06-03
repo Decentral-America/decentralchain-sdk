@@ -227,7 +227,7 @@ export namespace txFields {
   }]
 }
 
-export const orderSchemaV0: TObject = {
+export const orderSchemaV1: TObject = {
   type: 'object',
   schema: [
     txFields.senderPublicKey,
@@ -257,7 +257,19 @@ export const orderSchemaV2: TSchema = {
   type: 'object',
   schema: [
     txFields.version,
-    ...orderSchemaV0.schema,
+    ...orderSchemaV1.schema,
+  ],
+}
+
+// In order v3 amount and price fields are flipped
+export const orderSchemaV3: TSchema = {
+  type: 'object',
+  schema: [
+    ...orderSchemaV2.schema.slice(0,5),
+    txFields.longField('amount'),
+    txFields.longField('price'),
+    ...orderSchemaV2.schema.slice(7),
+    ['matcherFeeAssetId', txFields.optionalAssetId[1]]
   ],
 }
 
@@ -358,7 +370,7 @@ export const proofsSchemaV1: TSchema = {
 
 const orderSchemaV0WithSignature: TObject = {
   type: 'object',
-  schema: [...orderSchemaV0.schema, txFields.signature],
+  schema: [...orderSchemaV1.schema, txFields.signature],
 }
 //ExchangeV0 needs both orders length to be present before actual order bytes.
 // That's why there are two separate rules for oder1 and order2 fields. First one serializes order and writes length.
@@ -397,7 +409,7 @@ const anyOrder = anyOf([
         return {value: value + 1, shift}
       }
     } as TPrimitive,
-    schema: [txFields.byteConstant(1), ...orderSchemaV0.schema, ...proofsSchemaV0.schema]
+    schema: [txFields.byteConstant(1), ...orderSchemaV1.schema, ...proofsSchemaV0.schema]
   }],
   [2, {type: 'object', withLength: intConverter, schema: [...orderSchemaV2.schema, ...proofsSchemaV1.schema]}],
 ], {discriminatorField: 'version', discriminatorBytePos: 4})
@@ -588,6 +600,11 @@ export const schemasByTypeMap = {
   },
 }
 
+export const orderVersionMap: Record<number, TObject> = {
+  1: orderSchemaV1,
+  2: orderSchemaV2,
+  3: orderSchemaV3
+}
 
 export function getTransactionSchema(type: TRANSACTION_TYPE, version?: number): TSchema {
   const schemas = (<any>schemasByTypeMap)[type]

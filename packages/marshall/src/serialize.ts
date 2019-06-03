@@ -1,6 +1,6 @@
 import {BYTE, LEN, SHORT, STRING, TSerializer} from './serializePrimitives'
 import {concat} from './libs/utils'
-import {orderSchemaV0, orderSchemaV2, getTransactionSchema} from './schemas'
+import {orderSchemaV1, orderSchemaV2, getTransactionSchema, orderVersionMap} from './schemas'
 import {TSchema} from './schemaTypes'
 
 export type TFromLongConverter<LONG> = (v: LONG) => string
@@ -103,7 +103,8 @@ export function serializeTx<LONG = string | number>(tx: any, fromLongConverter?:
 }
 
 export function serializeOrder<LONG = string | number>(ord: any, fromLongConverter?: TFromLongConverter<LONG>): Uint8Array {
-  const {version} = ord
-  const schema = version == 2 ? orderSchemaV2 : orderSchemaV0
+  const version = ord.version || 1
+  const schema = orderVersionMap[version]
+  if (schema == null) throw new Error(`Unknown order version: ${version}`)
   return serializerFromSchema(schema, fromLongConverter)(ord)
 }
