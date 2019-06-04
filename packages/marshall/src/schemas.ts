@@ -265,10 +265,7 @@ export const orderSchemaV2: TSchema = {
 export const orderSchemaV3: TSchema = {
   type: 'object',
   schema: [
-    ...orderSchemaV2.schema.slice(0,5),
-    txFields.longField('amount'),
-    txFields.longField('price'),
-    ...orderSchemaV2.schema.slice(7),
+    ...orderSchemaV2.schema,
     ['matcherFeeAssetId', txFields.optionalAssetId[1]]
   ],
 }
