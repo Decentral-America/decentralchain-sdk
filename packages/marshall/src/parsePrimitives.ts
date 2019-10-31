@@ -1,7 +1,7 @@
-import Long = require('long')
 import {Utf8ArrayToStr} from './libs/Utf8ArrayToStr'
 import base58 from './libs/base58'
 import * as Base64 from 'base64-js'
+import {BigNumber} from '@waves/bignumber'
 
 export const ALIAS_VERSION: number = 2
 
@@ -28,7 +28,7 @@ export const P_INT: TParser<number> = (bytes, start = 0) => ({
 })
 
 export const P_LONG: TParser<string> = (bytes, start = 0) => ({
-  value: Long.fromBytesBE(Array.from(bytes.slice(start, start + 8))).toString(),
+  value: BigNumber.fromBytes(Array.from(bytes.slice(start, start + 8))).toString(),
   shift: 8,
 })
 

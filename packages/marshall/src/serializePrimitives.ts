@@ -1,7 +1,7 @@
 import base58 from './libs/base58'
 import * as Base64 from 'base64-js'
 import {concat} from './libs/utils'
-import Long = require('long')
+import { BigNumber } from "@waves/bignumber"
 
 const stringToUint8Array = (str: string) =>
   Uint8Array.from([...unescape(encodeURIComponent(str))].map(c => c.charCodeAt(0)))
@@ -22,18 +22,18 @@ export const STRING: TSerializer<Option<string>> = (value: Option<string>) => va
 
 export const BYTE: TSerializer<number> = (value: number) => Uint8Array.from([value])
 
-export const BOOL: TSerializer<boolean> = (value: boolean) => BYTE(value == true ? 1 : 0)
+export const BOOL: TSerializer<boolean> = (value: boolean) => BYTE(value ? 1 : 0)
 
 export const BYTES: TSerializer<Uint8Array | number[]> = (value: Uint8Array | number[]) => Uint8Array.from(value)
 
 export const SHORT: TSerializer<number> = (value: number) => {
-  const s = Long.fromNumber(value, true)
-  return Uint8Array.from(s.toBytesBE().slice(6))
+  const b = new BigNumber(value).toBytes()
+  return Uint8Array.from(Array.from({length:2}, (_, i) => b[i - 2 + b.length] || 0))
 }
 
 export const INT: TSerializer<number> = (value: number) => {
-  const i = Long.fromNumber(value, true)
-  return Uint8Array.from(i.toBytesBE().slice(4))
+  const b = new BigNumber(value).toBytes()
+  return Uint8Array.from(Array.from({length:4}, (_, i) => b[i - 4 + b.length] || 0))
 }
 
 export const OPTION = <T, R = T | null | undefined>(s: TSerializer<T>): TSerializer<R> => (value: R) =>
@@ -54,16 +54,16 @@ export const COUNT = (countSerializer: TSerializer<number>) => <T>(itemSerialize
 }
 
 export const LONG: TSerializer<number | string> = (value: number | string) => {
-  let l: Long
+  let b: Uint8Array
   if (typeof value === 'number') {
     if (value > 2 ** 53 - 1) {
       throw new Error(`${value} is too big to be precisely represented as js number. Use string instead`)
     }
-    l = Long.fromNumber(value)
+    b = new BigNumber(value).toBytes()
   } else {
-    l = Long.fromString(value.toString())
+    b = new BigNumber(value).toBytes()
   }
-  return Uint8Array.from(l.toBytesBE())
+  return Uint8Array.from(Array.from({length:8}, (_, i) => b[i - 8 + b.length] || 0))
 }
 
 export const SCRIPT: TSerializer<string | null> = (script) => OPTION(LEN(SHORT)(BASE64_STRING))(script ? script.slice(7) : null)
