@@ -38,13 +38,6 @@ describe('Tx serialize/parse', ()=> {
     expect(tx).toMatchObject(parsed)
   })
 
-  it('Should correctly serialize BignumberJs', ()=>{
-    const tx: any = exampleTxs[12]
-    const bytes = binary.serializeTx({...tx, fee: new BigNumber(tx.fee)})
-    const parsed = binary.parseTx<number>(bytes, parseInt)
-    expect(tx).toMatchObject(parsed)
-  })
-
   it('Should convertLongFields LONGjs', ()=>{
     const tx = exampleTxs[12]
     const bytes = binary.serializeTx(tx)
