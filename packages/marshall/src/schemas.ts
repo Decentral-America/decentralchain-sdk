@@ -298,7 +298,7 @@ export const burnSchemaV2: TSchema = {
     txFields.chainId,
     txFields.senderPublicKey,
     txFields.assetId,
-    txFields.quantity,
+    txFields.amount,
     txFields.fee,
     txFields.timestamp,
   ],
