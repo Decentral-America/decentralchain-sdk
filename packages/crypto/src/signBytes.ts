@@ -1,10 +1,9 @@
-import { sign_bytes } from '../pkg/waves_crypto';
-import { initWasm } from './initWasm';
+import { initWasm } from './initWasm.js';
 
-export function signBytes(privateKey: Uint8Array, bytes: Uint8Array) {
-  initWasm();
+export async function signBytes(privateKey: Uint8Array, bytes: Uint8Array) {
+  const wasm = await initWasm();
 
-  return sign_bytes(
+  return wasm.sign_bytes(
     privateKey,
     bytes,
     crypto.getRandomValues(new Uint8Array(64))

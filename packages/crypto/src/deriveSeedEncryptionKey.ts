@@ -1,8 +1,7 @@
-import { md5 } from '../pkg/waves_crypto';
-import { base16Encode } from './base16';
-import { initWasm } from './initWasm';
-import { sha256 } from './sha256';
-import { utf8Decode, utf8Encode } from './utf8';
+import { base16Encode } from './base16.js';
+import { initWasm } from './initWasm.js';
+import { sha256 } from './sha256.js';
+import { utf8Decode, utf8Encode } from './utf8.js';
 
 export async function deriveSeedEncryptionKey(
   password: Uint8Array,
@@ -23,13 +22,15 @@ export async function deriveSeedEncryptionKey(
       .map(c => c.charCodeAt(0))
   );
 
-  initWasm();
+  const wasm = await initWasm();
 
-  const part1 = md5(Uint8Array.of(...hashedPasswordBytes, ...salt));
-  const part2 = md5(Uint8Array.of(...part1, ...hashedPasswordBytes, ...salt));
+  const part1 = wasm.md5(Uint8Array.of(...hashedPasswordBytes, ...salt));
+  const part2 = wasm.md5(
+    Uint8Array.of(...part1, ...hashedPasswordBytes, ...salt)
+  );
 
   const key = Uint8Array.of(...part1, ...part2);
-  const iv = md5(Uint8Array.of(...part2, ...hashedPasswordBytes, ...salt));
+  const iv = wasm.md5(Uint8Array.of(...part2, ...hashedPasswordBytes, ...salt));
 
   return [key, iv];
 }

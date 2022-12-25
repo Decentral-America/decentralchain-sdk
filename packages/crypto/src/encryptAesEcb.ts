@@ -1,4 +1,4 @@
-import { createAesKeys, ROUND_COUNT, S } from './aesCommon';
+import { createAesKeys, ROUND_COUNT, S } from './aesCommon.js';
 
 const T1 = new Uint32Array([
   0xc66363a5, 0xf87c7c84, 0xee777799, 0xf67b7b8d, 0xfff2f20d, 0xd66b6bbd,

@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*.spec.ts", "vite.config.ts"],
+  "include": ["src/**/*.spec.ts", "vitest.config.ts"],
   "compilerOptions": {
     "composite": true,
     "downlevelIteration": true,

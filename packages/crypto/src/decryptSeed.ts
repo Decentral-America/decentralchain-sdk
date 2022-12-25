@@ -1,4 +1,4 @@
-import { deriveSeedEncryptionKey } from './deriveSeedEncryptionKey';
+import { deriveSeedEncryptionKey } from './deriveSeedEncryptionKey.js';
 
 export async function decryptSeed(
   input: Uint8Array,

@@ -1,4 +1,4 @@
-import { seedWords } from './seedWords';
+import { seedWords } from './seedWords.js';
 
 export function generateRandomSeed(wordsCount = 15) {
   return Array.from(

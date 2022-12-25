@@ -17,23 +17,22 @@
   "sideEffects": false,
   "files": [
     "dist",
+    "pkg",
     "src",
     "!src/**/*.spec.ts"
   ],
   "scripts": {
     "cleanup": "rimraf dist pkg",
-    "dev:rs": "wasm-pack build --target web --dev",
+    "dev:rs": "wasm-pack build --target web --dev && rimraf pkg/package.json",
     "dev:ts": "tsc --watch",
-    "dev:js": "vite build --watch",
     "lint:prettier": "prettier . --check",
     "lint:prettier:fix": "prettier . --write",
     "lint:eslint": "eslint --max-warnings 0 .",
     "lint:typescript": "tsc -p tsconfig.node.json --noEmit",
     "test": "vitest",
-    "build:rs": "wasm-pack build --target web --release",
+    "build:rs": "wasm-pack build --target web --release && rimraf pkg/package.json",
     "build:ts": "tsc",
-    "build:js": "vite build",
-    "build": "yarn run build:rs && yarn run build:ts && yarn run build:js"
+    "build": "yarn run build:rs && yarn run build:ts"
   },
   "dependencies": {
     "@noble/hashes": "^1.1.4",
@@ -51,7 +50,6 @@
     "semantic-release-export-data": "^1.0.1",
     "size-limit": "^8.1.0",
     "typescript": "^4.9.4",
-    "vite": "^4.0.0",
     "vitest": "^0.26.0"
   }
 }

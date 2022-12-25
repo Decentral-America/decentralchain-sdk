@@ -1,5 +1,5 @@
-import { blake2b } from './blake2b';
-import { keccak } from './keccak';
+import { blake2b } from './blake2b.js';
+import { keccak } from './keccak.js';
 
 export function verifyAddress(
   bytes: Uint8Array,

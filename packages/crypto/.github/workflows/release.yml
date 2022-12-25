@@ -22,6 +22,7 @@ jobs:
       - run: yarn run build
       - run: yarn run lint:typescript
       - run: yarn test
+      - run: rm pkg/.gitignore
       - run: yarn semantic-release
         id: semantic-release
         env:

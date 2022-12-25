@@ -19,7 +19,7 @@ import {
   utf8Encode,
   verifyAddress,
   verifySignature,
-} from '..';
+} from '../dist';
 
 describe('encoding & decoding', () => {
   describe.each([
@@ -203,8 +203,8 @@ describe('createPublicKey', () => {
         54,
       ]),
     },
-  ])('createPublicKey($seed)', ({ privateKey, publicKey }) => {
-    expect(createPublicKey(privateKey)).toStrictEqual(publicKey);
+  ])('createPublicKey($seed)', async ({ privateKey, publicKey }) => {
+    await expect(createPublicKey(privateKey)).resolves.toStrictEqual(publicKey);
   });
 });
 
@@ -215,11 +215,16 @@ describe('createSharedKey', () => {
       createPrivateKey(utf8Encode('bob')),
     ]);
 
+    const [alicePublicKey, bobPublicKey] = await Promise.all([
+      createPublicKey(alicePrivateKey),
+      createPublicKey(bobPrivateKey),
+    ]);
+
     const prefix = utf8Encode('waves');
 
     const sharedA = await createSharedKey(
       alicePrivateKey,
-      createPublicKey(bobPrivateKey),
+      bobPublicKey,
       prefix
     );
 
@@ -232,7 +237,7 @@ describe('createSharedKey', () => {
     );
 
     await expect(
-      createSharedKey(bobPrivateKey, createPublicKey(alicePrivateKey), prefix)
+      createSharedKey(bobPrivateKey, alicePublicKey, prefix)
     ).resolves.toStrictEqual(sharedA);
   });
 
@@ -242,12 +247,17 @@ describe('createSharedKey', () => {
       createPrivateKey(utf8Encode(generateRandomSeed())),
     ]);
 
+    const [aPublicKey, bPublicKey] = await Promise.all([
+      createPublicKey(aPrivateKey),
+      createPublicKey(bPrivateKey),
+    ]);
+
     const prefix = utf8Encode('something random');
 
     await expect(
-      createSharedKey(bPrivateKey, createPublicKey(aPrivateKey), prefix)
+      createSharedKey(bPrivateKey, aPublicKey, prefix)
     ).resolves.toStrictEqual(
-      await createSharedKey(aPrivateKey, createPublicKey(bPrivateKey), prefix)
+      await createSharedKey(aPrivateKey, bPublicKey, prefix)
     );
   });
 });
@@ -259,9 +269,11 @@ describe('encryptMessage/decryptMessage', () => {
       createPrivateKey(utf8Encode('bob')),
     ]);
 
+    const alicePublicKey = await createPublicKey(alicePrivateKey);
+
     const sharedKey = await createSharedKey(
       bobPrivateKey,
-      createPublicKey(alicePrivateKey),
+      alicePublicKey,
       utf8Encode('some prefix')
     );
 
@@ -290,11 +302,16 @@ describe('encryptMessage/decryptMessage', () => {
       createPrivateKey(utf8Encode(generateRandomSeed())),
     ]);
 
+    const [aPublicKey, bPublicKey] = await Promise.all([
+      createPublicKey(aPrivateKey),
+      createPublicKey(bPrivateKey),
+    ]);
+
     const prefix = utf8Encode('some prefix');
 
     const [aSharedKey, bSharedKey] = await Promise.all([
-      createSharedKey(aPrivateKey, createPublicKey(bPrivateKey), prefix),
-      createSharedKey(bPrivateKey, createPublicKey(aPrivateKey), prefix),
+      createSharedKey(aPrivateKey, bPublicKey, prefix),
+      createSharedKey(bPrivateKey, aPublicKey, prefix),
     ]);
 
     const messageBytes = utf8Encode('中國的東西');
@@ -352,16 +369,18 @@ test('signBytes/verifySignature', async () => {
     utf8Encode('1f98af466da54014bdc08bfbaaaf3c67')
   );
 
-  const publicKey = createPublicKey(privateKey);
+  const publicKey = await createPublicKey(privateKey);
 
   const bytes = Uint8Array.from([1, 2, 3, 4]);
-  const signature = signBytes(privateKey, bytes);
+  const signature = await signBytes(privateKey, bytes);
 
-  expect(verifySignature(publicKey, bytes, signature)).toBe(true);
+  await expect(verifySignature(publicKey, bytes, signature)).resolves.toBe(
+    true
+  );
 
-  expect(
+  await expect(
     verifySignature(publicKey, Uint8Array.from([4, 3, 2, 1]), signature)
-  ).toBe(false);
+  ).resolves.toBe(false);
 });
 
 describe('verifyAddress', () => {

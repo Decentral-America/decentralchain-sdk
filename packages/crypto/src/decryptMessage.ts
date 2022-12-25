@@ -1,5 +1,5 @@
-import { decryptAesEcb } from './decryptAesEcb';
-import { hmac } from './hmac';
+import { decryptAesEcb } from './decryptAesEcb.js';
+import { hmac } from './hmac.js';
 
 export async function decryptMessage(sharedKey: Uint8Array, input: Uint8Array) {
   const cek = decryptAesEcb(sharedKey, input.subarray(1, 49)).subarray(0, 32);

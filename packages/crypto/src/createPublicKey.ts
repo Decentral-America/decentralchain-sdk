@@ -1,8 +1,7 @@
-import { create_public_key } from '../pkg/waves_crypto';
-import { initWasm } from './initWasm';
+import { initWasm } from './initWasm.js';
 
-export function createPublicKey(privateKey: Uint8Array) {
-  initWasm();
+export async function createPublicKey(privateKey: Uint8Array) {
+  const wasm = await initWasm();
 
-  return create_public_key(privateKey);
+  return wasm.create_public_key(privateKey);
 }

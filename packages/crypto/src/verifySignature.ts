@@ -1,12 +1,11 @@
-import { verify_signature } from '../pkg/waves_crypto';
-import { initWasm } from './initWasm';
+import { initWasm } from './initWasm.js';
 
-export function verifySignature(
+export async function verifySignature(
   publicKey: Uint8Array,
   bytes: Uint8Array,
   signature: Uint8Array
 ) {
-  initWasm();
+  const wasm = await initWasm();
 
-  return verify_signature(publicKey, bytes, signature);
+  return wasm.verify_signature(publicKey, bytes, signature);
 }

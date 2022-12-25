@@ -1,5 +1,5 @@
-import { encryptAesEcb } from './encryptAesEcb';
-import { hmac } from './hmac';
+import { encryptAesEcb } from './encryptAesEcb.js';
+import { hmac } from './hmac.js';
 
 export async function encryptMessage(
   sharedKey: Uint8Array,

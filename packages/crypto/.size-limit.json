@@ -1,6 +1,12 @@
 [
   {
-    "path": "dist/*.js",
-    "limit": 62744
+    "name": "js",
+    "path": ["dist/*.js", "pkg/*.js"],
+    "limit": 31190
+  },
+  {
+    "name": "wasm",
+    "path": ["pkg/*.wasm"],
+    "limit": 21115
   }
 ]
