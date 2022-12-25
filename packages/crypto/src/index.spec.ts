@@ -5,7 +5,6 @@ import {
   base58Encode,
   base64Decode,
   base64Encode,
-  bytesToString,
   createAddress,
   createPrivateKey,
   createPublicKey,
@@ -16,7 +15,8 @@ import {
   encryptSeed,
   generateRandomSeed,
   signBytes,
-  stringToBytes,
+  utf8Decode,
+  utf8Encode,
   verifyAddress,
   verifySignature,
 } from '..';
@@ -72,11 +72,6 @@ describe('encoding & decoding', () => {
       base64: '4pi44pi54pi64pi74pi84pi+4pi/',
     },
   ])('$string', ({ string, bytes, base16, base58, base64 }) => {
-    test('bytes', () => {
-      expect(stringToBytes(string)).toStrictEqual(bytes);
-      expect(bytesToString(bytes)).toBe(string);
-    });
-
     test('base16', () => {
       expect(base16Encode(bytes)).toStrictEqual(base16);
       expect(base16Decode(base16)).toStrictEqual(bytes);
@@ -90,6 +85,11 @@ describe('encoding & decoding', () => {
     test('base64', () => {
       expect(base64Encode(bytes)).toBe(base64);
       expect(base64Decode(base64)).toStrictEqual(bytes);
+    });
+
+    test('utf8', () => {
+      expect(utf8Encode(string)).toStrictEqual(bytes);
+      expect(utf8Decode(bytes)).toBe(string);
     });
   });
 });
@@ -174,7 +174,7 @@ describe('createPrivateKey', () => {
     },
   ])('createPrivateKey($seed)', async ({ seed, nonce, privateKey }) => {
     await expect(
-      createPrivateKey(stringToBytes(seed), nonce)
+      createPrivateKey(utf8Encode(seed), nonce)
     ).resolves.toStrictEqual(privateKey);
   });
 });
@@ -211,11 +211,11 @@ describe('createPublicKey', () => {
 describe('createSharedKey', () => {
   test('fixed', async () => {
     const [alicePrivateKey, bobPrivateKey] = await Promise.all([
-      createPrivateKey(stringToBytes('alice')),
-      createPrivateKey(stringToBytes('bob')),
+      createPrivateKey(utf8Encode('alice')),
+      createPrivateKey(utf8Encode('bob')),
     ]);
 
-    const prefix = stringToBytes('waves');
+    const prefix = utf8Encode('waves');
 
     const sharedA = await createSharedKey(
       alicePrivateKey,
@@ -238,11 +238,11 @@ describe('createSharedKey', () => {
 
   test('random', async () => {
     const [aPrivateKey, bPrivateKey] = await Promise.all([
-      createPrivateKey(stringToBytes(generateRandomSeed())),
-      createPrivateKey(stringToBytes(generateRandomSeed())),
+      createPrivateKey(utf8Encode(generateRandomSeed())),
+      createPrivateKey(utf8Encode(generateRandomSeed())),
     ]);
 
-    const prefix = stringToBytes('something random');
+    const prefix = utf8Encode('something random');
 
     await expect(
       createSharedKey(bPrivateKey, createPublicKey(aPrivateKey), prefix)
@@ -255,14 +255,14 @@ describe('createSharedKey', () => {
 describe('encryptMessage/decryptMessage', () => {
   test('fixed', async () => {
     const [alicePrivateKey, bobPrivateKey] = await Promise.all([
-      createPrivateKey(stringToBytes('alice')),
-      createPrivateKey(stringToBytes('bob')),
+      createPrivateKey(utf8Encode('alice')),
+      createPrivateKey(utf8Encode('bob')),
     ]);
 
     const sharedKey = await createSharedKey(
       bobPrivateKey,
       createPublicKey(alicePrivateKey),
-      stringToBytes('some prefix')
+      utf8Encode('some prefix')
     );
 
     await expect(
@@ -281,23 +281,23 @@ describe('encryptMessage/decryptMessage', () => {
           171, 49, 34, 228, 123, 160, 203,
         ])
       )
-    ).resolves.toStrictEqual(stringToBytes('中國的東西'));
+    ).resolves.toStrictEqual(utf8Encode('中國的東西'));
   });
 
   test('random', async () => {
     const [aPrivateKey, bPrivateKey] = await Promise.all([
-      createPrivateKey(stringToBytes(generateRandomSeed())),
-      createPrivateKey(stringToBytes(generateRandomSeed())),
+      createPrivateKey(utf8Encode(generateRandomSeed())),
+      createPrivateKey(utf8Encode(generateRandomSeed())),
     ]);
 
-    const prefix = stringToBytes('some prefix');
+    const prefix = utf8Encode('some prefix');
 
     const [aSharedKey, bSharedKey] = await Promise.all([
       createSharedKey(aPrivateKey, createPublicKey(bPrivateKey), prefix),
       createSharedKey(bPrivateKey, createPublicKey(aPrivateKey), prefix),
     ]);
 
-    const messageBytes = stringToBytes('中國的東西');
+    const messageBytes = utf8Encode('中國的東西');
     const encryptedMessage = await encryptMessage(aSharedKey, messageBytes);
 
     await expect(
@@ -309,14 +309,14 @@ describe('encryptMessage/decryptMessage', () => {
 describe('encryptSeed/decryptSeed', () => {
   test('fixed', async () => {
     expect(
-      bytesToString(
+      utf8Decode(
         await decryptSeed(
           new Uint8Array([
             83, 97, 108, 116, 101, 100, 95, 95, 59, 101, 65, 239, 197, 127, 191,
             144, 31, 110, 249, 46, 194, 198, 28, 177, 124, 40, 252, 136, 133,
             69, 231, 2,
           ]),
-          stringToBytes('🔑')
+          utf8Encode('🔑')
         )
       )
     ).toBe('🙈');
@@ -325,20 +325,17 @@ describe('encryptSeed/decryptSeed', () => {
   test('random', async () => {
     await expect(
       decryptSeed(
-        await encryptSeed(stringToBytes('🙈'), stringToBytes('🔑')),
-        stringToBytes('🔑')
+        await encryptSeed(utf8Encode('🙈'), utf8Encode('🔑')),
+        utf8Encode('🔑')
       )
-    ).resolves.toStrictEqual(stringToBytes('🙈'));
+    ).resolves.toStrictEqual(utf8Encode('🙈'));
 
     await expect(
       decryptSeed(
-        await encryptSeed(
-          stringToBytes('Exact16BytesText'),
-          stringToBytes('🗝️')
-        ),
-        stringToBytes('🗝️')
+        await encryptSeed(utf8Encode('Exact16BytesText'), utf8Encode('🗝️')),
+        utf8Encode('🗝️')
       )
-    ).resolves.toStrictEqual(stringToBytes('Exact16BytesText'));
+    ).resolves.toStrictEqual(utf8Encode('Exact16BytesText'));
   });
 });
 
@@ -352,7 +349,7 @@ test('generateRandomSeed', () => {
 
 test('signBytes/verifySignature', async () => {
   const privateKey = await createPrivateKey(
-    stringToBytes('1f98af466da54014bdc08bfbaaaf3c67')
+    utf8Encode('1f98af466da54014bdc08bfbaaaf3c67')
   );
 
   const publicKey = createPublicKey(privateKey);
