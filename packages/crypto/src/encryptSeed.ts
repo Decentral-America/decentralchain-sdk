@@ -1,5 +1,5 @@
 import { deriveSeedEncryptionKey } from './deriveSeedEncryptionKey';
-import { stringToBytes } from './utf-8';
+import { stringToBytes } from './utf8';
 
 export async function encryptSeed(
   input: Uint8Array,

@@ -13,6 +13,6 @@ export { encryptSeed } from './encryptSeed';
 export { generateRandomSeed } from './generateRandomSeed';
 export { keccak } from './keccak';
 export { signBytes } from './signBytes';
-export { bytesToString, stringToBytes } from './utf-8';
+export { bytesToString, stringToBytes } from './utf8';
 export { verifyAddress } from './verifyAddress';
 export { verifySignature } from './verifySignature';
