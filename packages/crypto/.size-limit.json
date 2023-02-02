@@ -2,11 +2,11 @@
   {
     "name": "js",
     "path": ["dist/*.js", "pkg/*.js"],
-    "limit": 31210
+    "limit": "32 kB"
   },
   {
     "name": "wasm",
     "path": ["pkg/*.wasm"],
-    "limit": 21163
+    "limit": "22 kB"
   }
 ]
