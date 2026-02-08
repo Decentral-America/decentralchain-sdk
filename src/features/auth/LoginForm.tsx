@@ -14,6 +14,7 @@ import { Stack } from '@/components/atoms/Stack';
 import { Card, CardBody } from '@/components/atoms/Card';
 import { multiAccount } from '@/services/multiAccount';
 import { AccountSelectScreen } from './AccountSelectScreen';
+import { NoAccountModal } from '@/components/modals/NoAccountModal';
 
 const FormContainer = styled.div`
   width: 100%;
@@ -96,6 +97,7 @@ export const LoginForm = () => {
     Array<{ hash: string; name?: string; address: string; lastLogin?: number }>
   >([]);
   const [showAccountSelect, setShowAccountSelect] = useState(false);
+  const [showNoAccountModal, setShowNoAccountModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState(false);
   const { login, getActiveState, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -114,15 +116,14 @@ export const LoginForm = () => {
     }
   }, [pendingNavigation, isAuthenticated, user, navigate]);
 
-  // Check if accounts exist on mount
+  // Check if accounts exist on mount — show modal if none found
   useEffect(() => {
     const multiAccountData = localStorage.getItem('multiAccountData');
     if (!multiAccountData) {
-      // No accounts exist, redirect to signup
-      console.log('[LoginForm] No accounts found, redirecting to signup');
-      navigate('/auth/create');
+      console.log('[LoginForm] No accounts found, showing wallet options modal');
+      setShowNoAccountModal(true);
     }
-  }, [navigate]);
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -244,20 +245,28 @@ export const LoginForm = () => {
               <HelpText>
                 Don&apos;t have a wallet?{' '}
                 <a
-                  href="/auth/create"
+                  href="#"
                   style={{ color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate('/auth/create');
+                    setShowNoAccountModal(true);
                   }}
                 >
-                  Create one
+                  Create or import one
                 </a>
               </HelpText>
             </Stack>
           </form>
         </CardBody>
       </Card>
+
+      <NoAccountModal
+        open={showNoAccountModal}
+        onClose={() => setShowNoAccountModal(false)}
+        onCreateWallet={() => navigate('/signup')}
+        onImportSeedPhrase={() => navigate('/import-account')}
+        onImportPrivateKey={() => navigate('/import-account?mode=privatekey')}
+      />
     </FormContainer>
   );
 };
