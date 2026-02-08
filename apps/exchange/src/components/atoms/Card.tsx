@@ -48,6 +48,9 @@ const StyledCard = styled(MuiCard, {
     transition: theme.transitions.create(['transform', 'box-shadow'], {
       duration: theme.transitions.duration.short,
     }),
+    [theme.breakpoints.down('sm')]: {
+      padding: padding || theme.spacing(1.5),
+    },
     ...(hoverable && {
       cursor: 'pointer',
       '&:hover': {

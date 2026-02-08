@@ -22,28 +22,37 @@ const FormContainer = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: ${(p) => p.theme.fontSizes.xxl};
+  font-size: ${(p) => p.theme.fontSizes.xl};
   font-weight: ${(p) => p.theme.fontWeights.bold};
-  margin: 0 0 ${(p) => p.theme.spacing.md} 0;
+  margin: 0 0 ${(p) => p.theme.spacing.sm} 0;
   color: ${(p) => p.theme.colors.text};
+
+  @media (min-width: 481px) {
+    font-size: ${(p) => p.theme.fontSizes.xxl};
+    margin: 0 0 ${(p) => p.theme.spacing.md} 0;
+  }
 `;
 
 const Description = styled.p`
   font-size: ${(p) => p.theme.fontSizes.sm};
   color: ${(p) => p.theme.colors.text};
   opacity: 0.7;
-  margin: 0 0 ${(p) => p.theme.spacing.lg} 0;
+  margin: 0 0 ${(p) => p.theme.spacing.md} 0;
   line-height: 1.6;
+
+  @media (min-width: 481px) {
+    margin: 0 0 ${(p) => p.theme.spacing.lg} 0;
+  }
 `;
 
 const WarningBox = styled.div`
   display: flex;
-  gap: ${(p) => p.theme.spacing.md};
-  padding: ${(p) => p.theme.spacing.md};
+  gap: ${(p) => p.theme.spacing.sm};
+  padding: ${(p) => p.theme.spacing.sm} ${(p) => p.theme.spacing.md};
   background: ${(p) => p.theme.colors.warning};
   color: white;
   border-radius: ${(p) => p.theme.radii.md};
-  margin-bottom: ${(p) => p.theme.spacing.lg};
+  margin-bottom: ${(p) => p.theme.spacing.md};
   align-items: flex-start;
 `;
 
@@ -72,16 +81,21 @@ const SeedPhraseBox = styled.div`
   background: ${(p) => p.theme.colors.background};
   border: 2px solid ${(p) => p.theme.colors.border};
   border-radius: ${(p) => p.theme.radii.md};
-  padding: ${(p) => p.theme.spacing.lg};
-  margin-bottom: ${(p) => p.theme.spacing.lg};
+  padding: ${(p) => p.theme.spacing.md};
+  margin-bottom: ${(p) => p.theme.spacing.md};
   position: relative;
+
+  @media (min-width: 481px) {
+    padding: ${(p) => p.theme.spacing.lg};
+    margin-bottom: ${(p) => p.theme.spacing.lg};
+  }
 `;
 
 const SeedPhraseGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: ${(p) => p.theme.spacing.sm};
-  margin-bottom: ${(p) => p.theme.spacing.md};
+  margin-bottom: ${(p) => p.theme.spacing.sm};
 
   @media (max-width: ${(p) => p.theme.breakpoints.tablet}) {
     grid-template-columns: repeat(3, 1fr);
@@ -89,16 +103,26 @@ const SeedPhraseGrid = styled.div`
 
   @media (max-width: ${(p) => p.theme.breakpoints.mobile}) {
     grid-template-columns: repeat(2, 1fr);
+    gap: ${(p) => p.theme.spacing.xs};
   }
 `;
 
 const SeedWord = styled.div`
-  padding: ${(p) => p.theme.spacing.sm};
+  display: flex;
+  align-items: center;
+  gap: ${(p) => p.theme.spacing.xs};
+  padding: ${(p) => p.theme.spacing.xs} ${(p) => p.theme.spacing.sm};
   background: ${(p) => p.theme.colors.hover};
   border-radius: ${(p) => p.theme.radii.sm};
   font-family: ${(p) => p.theme.fonts.mono};
-  font-size: ${(p) => p.theme.fontSizes.sm};
+  font-size: ${(p) => p.theme.fontSizes.xs};
   text-align: center;
+
+  @media (min-width: 481px) {
+    padding: ${(p) => p.theme.spacing.sm};
+    font-size: ${(p) => p.theme.fontSizes.sm};
+    gap: ${(p) => p.theme.spacing.sm};
+  }
 
   span {
     opacity: 0.5;
@@ -122,15 +146,21 @@ const CheckboxLabel = styled.label`
 `;
 
 const InstructionsList = styled.ul`
-  margin: ${(p) => p.theme.spacing.md} 0;
+  margin: ${(p) => p.theme.spacing.sm} 0;
   padding-left: ${(p) => p.theme.spacing.lg};
-  font-size: ${(p) => p.theme.fontSizes.sm};
-  line-height: 1.8;
+  font-size: ${(p) => p.theme.fontSizes.xs};
+  line-height: 1.6;
   color: ${(p) => p.theme.colors.text};
   opacity: 0.8;
 
   li {
     margin-bottom: ${(p) => p.theme.spacing.xs};
+  }
+
+  @media (min-width: 481px) {
+    margin: ${(p) => p.theme.spacing.md} 0;
+    font-size: ${(p) => p.theme.fontSizes.sm};
+    line-height: 1.8;
   }
 `;
 
@@ -138,7 +168,7 @@ const Divider = styled.div`
   display: flex;
   align-items: center;
   gap: ${(p) => p.theme.spacing.md};
-  margin: ${(p) => p.theme.spacing.lg} 0;
+  margin: ${(p) => p.theme.spacing.md} 0;
   
   &::before,
   &::after {
@@ -159,12 +189,12 @@ const Divider = styled.div`
 
 const LedgerInfoBox = styled.div`
   display: flex;
-  gap: ${(p) => p.theme.spacing.md};
-  padding: ${(p) => p.theme.spacing.lg};
+  gap: ${(p) => p.theme.spacing.sm};
+  padding: ${(p) => p.theme.spacing.md};
   background: ${(p) => p.theme.colors.primary};
   color: white;
   border-radius: ${(p) => p.theme.radii.md};
-  margin-bottom: ${(p) => p.theme.spacing.lg};
+  margin-bottom: ${(p) => p.theme.spacing.md};
   align-items: flex-start;
   cursor: pointer;
   transition: ${(p) => p.theme.transitions.fast};
@@ -173,11 +203,20 @@ const LedgerInfoBox = styled.div`
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
+
+  @media (max-width: ${(p) => p.theme.breakpoints.mobile}) {
+    padding: ${(p) => p.theme.spacing.sm} ${(p) => p.theme.spacing.md};
+    gap: ${(p) => p.theme.spacing.sm};
+  }
 `;
 
 const LedgerIcon = styled.div`
   flex-shrink: 0;
-  font-size: 32px;
+  font-size: 24px;
+
+  @media (min-width: 481px) {
+    font-size: 32px;
+  }
 `;
 
 export const CreateAccount = () => {
@@ -309,10 +348,10 @@ export const CreateAccount = () => {
               <LedgerInfoBox onClick={() => navigate('/import/ledger')}>
                 <LedgerIcon>🔐</LedgerIcon>
                 <div>
-                  <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 600 }}>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 600 }}>
                     Use Ledger Hardware Wallet
                   </h3>
-                  <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.5', opacity: 0.9 }}>
+                  <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.4', opacity: 0.9 }}>
                     For maximum security, use your Ledger Nano device instead of a seed phrase. Your private keys never leave the device.
                   </p>
                 </div>

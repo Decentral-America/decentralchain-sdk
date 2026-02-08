@@ -24,28 +24,38 @@ const BackupWrapper = styled.div`
 `;
 
 const Title = styled.h2`
-  margin: 0 0 ${(p) => p.theme.spacing.md};
-  font-size: ${(p) => p.theme.fontSizes.xl};
+  margin: 0 0 ${(p) => p.theme.spacing.sm};
+  font-size: ${(p) => p.theme.fontSizes.lg};
   font-weight: ${(p) => p.theme.fontWeights.semibold};
   color: ${(p) => p.theme.colors.text};
+
+  @media (min-width: 481px) {
+    font-size: ${(p) => p.theme.fontSizes.xl};
+    margin: 0 0 ${(p) => p.theme.spacing.md};
+  }
 `;
 
 const Description = styled.p`
-  margin: 0 0 ${(p) => p.theme.spacing.lg};
-  font-size: ${(p) => p.theme.fontSizes.md};
+  margin: 0 0 ${(p) => p.theme.spacing.md};
+  font-size: ${(p) => p.theme.fontSizes.sm};
   color: ${(p) => p.theme.colors.secondary};
   line-height: 1.5;
+
+  @media (min-width: 481px) {
+    margin: 0 0 ${(p) => p.theme.spacing.lg};
+    font-size: ${(p) => p.theme.fontSizes.md};
+  }
 `;
 
 const WarningBox = styled.div`
   display: flex;
   align-items: flex-start;
-  gap: ${(p) => p.theme.spacing.md};
-  padding: ${(p) => p.theme.spacing.md};
+  gap: ${(p) => p.theme.spacing.sm};
+  padding: ${(p) => p.theme.spacing.sm} ${(p) => p.theme.spacing.md};
   border-left: 4px solid ${(p) => p.theme.colors.warning};
   background-color: ${(p) => `${p.theme.colors.warning}10`};
   border-radius: ${(p) => p.theme.radii.md};
-  margin-bottom: ${(p) => p.theme.spacing.lg};
+  margin-bottom: ${(p) => p.theme.spacing.md};
 `;
 
 const WarningText = styled.div`
@@ -73,7 +83,7 @@ const SeedPhraseContainer = styled.div`
 
 const SeedPhraseBox = styled.div<{ $revealed: boolean }>`
   position: relative;
-  padding: ${(p) => p.theme.spacing.lg};
+  padding: ${(p) => p.theme.spacing.md};
   background-color: ${(p) => p.theme.colors.background};
   border: 2px solid ${(p) => p.theme.colors.border};
   border-radius: ${(p) => p.theme.radii.md};
@@ -81,21 +91,30 @@ const SeedPhraseBox = styled.div<{ $revealed: boolean }>`
   font-size: ${(p) => p.theme.fontSizes.md};
   line-height: 1.8;
   color: ${(p) => p.theme.colors.text};
-  min-height: 120px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
   filter: ${(p) => (p.$revealed ? 'none' : 'blur(8px)')};
   user-select: ${(p) => (p.$revealed ? 'text' : 'none')};
   transition: filter 0.3s ease;
+
+  @media (min-width: 481px) {
+    padding: ${(p) => p.theme.spacing.lg};
+    min-height: 120px;
+  }
 `;
 
 const SeedPhraseGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: ${(p) => p.theme.spacing.md};
+  gap: ${(p) => p.theme.spacing.xs};
 
-  @media (max-width: 768px) {
+  @media (min-width: 481px) {
+    gap: ${(p) => p.theme.spacing.md};
+  }
+
+  @media (max-width: 480px) {
     grid-template-columns: repeat(2, 1fr);
   }
 `;
@@ -103,10 +122,17 @@ const SeedPhraseGrid = styled.div`
 const SeedWord = styled.div`
   display: flex;
   align-items: center;
-  gap: ${(p) => p.theme.spacing.sm};
-  padding: ${(p) => p.theme.spacing.sm};
+  gap: ${(p) => p.theme.spacing.xs};
+  padding: ${(p) => p.theme.spacing.xs} ${(p) => p.theme.spacing.sm};
   background-color: ${(p) => p.theme.colors.hover};
   border-radius: ${(p) => p.theme.radii.sm};
+  font-size: 0.8rem;
+
+  @media (min-width: 481px) {
+    padding: ${(p) => p.theme.spacing.sm};
+    gap: ${(p) => p.theme.spacing.sm};
+    font-size: inherit;
+  }
 `;
 
 const WordNumber = styled.span`
@@ -194,7 +220,7 @@ For support, visit: https://decentralchain.io/support
   return (
     <BackupWrapper>
       <Card elevation="md">
-        <Stack gap="24px">
+        <Stack gap="16px">
           <div>
             <Title>Backup Your Seed Phrase</Title>
             <Description>
