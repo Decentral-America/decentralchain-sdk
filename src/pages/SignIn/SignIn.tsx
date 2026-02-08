@@ -213,7 +213,7 @@ export const SignIn: React.FC = () => {
                     width: '100%',
                     bgcolor: 'rgba(255, 255, 255, 0.95)',
                     borderRadius: 2.5,
-                    p: { xs: 3, md: 4 },
+                    p: { xs: 1.5, sm: 3, md: 4 },
                     boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
                     backdropFilter: 'blur(10px)',
                   }}
