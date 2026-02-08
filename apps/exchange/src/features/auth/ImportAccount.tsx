@@ -3,7 +3,7 @@
  * Imports existing wallet via seed phrase
  */
 import { useState, FormEvent, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/atoms/Button';
@@ -102,8 +102,38 @@ const Label = styled.label`
   margin-bottom: ${(p) => p.theme.spacing.xs};
 `;
 
+const ModeToggle = styled.div`
+  display: flex;
+  border: 2px solid ${(p) => p.theme.colors.border};
+  border-radius: ${(p) => p.theme.radii.md};
+  overflow: hidden;
+  margin-bottom: ${(p) => p.theme.spacing.lg};
+`;
+
+const ModeTab = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: ${(p) => p.theme.spacing.sm} ${(p) => p.theme.spacing.md};
+  border: none;
+  background: ${(p) => (p.$active ? p.theme.colors.primary : 'transparent')};
+  color: ${(p) => (p.$active ? 'white' : p.theme.colors.text)};
+  font-size: ${(p) => p.theme.fontSizes.sm};
+  font-weight: ${(p) => p.theme.fontWeights.semibold};
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${(p) => (p.$active ? p.theme.colors.primary : p.theme.colors.hover)};
+  }
+`;
+
+type ImportMode = 'seed' | 'privatekey';
+
 export const ImportAccount = () => {
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'privatekey' ? 'privatekey' : 'seed';
+  const [importMode, setImportMode] = useState<ImportMode>(initialMode);
   const [seedPhrase, setSeedPhrase] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
   const [password, setPassword] = useState('');
   const [accountName, setAccountName] = useState('');
   const [error, setError] = useState('');
@@ -139,16 +169,29 @@ export const ImportAccount = () => {
     setIsLoading(true);
 
     try {
-      // Validate seed phrase format
-      const trimmedSeed = seedPhrase.trim();
-      if (!trimmedSeed) {
-        throw new Error('Please enter your seed phrase');
-      }
+      // Determine the secret input based on mode
+      let secretInput: string;
 
-      // Split by spaces and count words
-      const words = trimmedSeed.split(/\s+/);
-      if (words.length !== 15) {
-        throw new Error('Seed phrase must contain exactly 15 words');
+      if (importMode === 'privatekey') {
+        const trimmedKey = privateKey.trim();
+        if (!trimmedKey) {
+          throw new Error('Please enter your private key');
+        }
+        // Basic base58 validation (44 chars typical for DecentralChain private keys)
+        if (trimmedKey.length < 32 || trimmedKey.length > 64) {
+          throw new Error('Invalid private key format. Please check and try again.');
+        }
+        secretInput = trimmedKey;
+      } else {
+        const trimmedSeed = seedPhrase.trim();
+        if (!trimmedSeed) {
+          throw new Error('Please enter your seed phrase');
+        }
+        const words = trimmedSeed.split(/\s+/);
+        if (words.length !== 15) {
+          throw new Error('Seed phrase must contain exactly 15 words');
+        }
+        secretInput = trimmedSeed;
       }
 
       // Validate password
@@ -163,15 +206,14 @@ export const ImportAccount = () => {
         }
 
         // FIRST ACCOUNT: Use create() to initialize vault
-        await create(trimmedSeed, password, accountName.trim(), true);
+        await create(secretInput, password, accountName.trim(), true);
 
         // create() sets user state; navigate via effect once state propagates
         navigationTarget.current = getActiveState('wallet');
         setPendingNavigation(true);
       } else {
         // ADDITIONAL ACCOUNT: Use addAccount() to add to existing vault
-        // This requires the vault password to decrypt and add new account
-        const addedUser = await addAccount(trimmedSeed, accountName.trim() || 'Imported Account');
+        const addedUser = await addAccount(secretInput, accountName.trim() || 'Imported Account');
 
         if (!addedUser) {
           throw new Error('Failed to add account');
@@ -203,8 +245,8 @@ export const ImportAccount = () => {
           <Title>{isFirstAccount ? 'Import Your Wallet' : 'Add Account'}</Title>
           <Description>
             {isFirstAccount
-              ? 'Enter your 15-word seed phrase and create a master password'
-              : 'Enter your 15-word seed phrase and master password to add this account'}
+              ? 'Restore your wallet using a seed phrase or private key'
+              : 'Add an account using a seed phrase or private key'}
           </Description>
 
           <InfoBox>
@@ -212,9 +254,19 @@ export const ImportAccount = () => {
               <Icon name={CommonIcons.Info} size={20} color="white" />
             </InfoIcon>
             <span>
-              Make sure you&apos;re in a private location before entering your seed phrase
+              Make sure you&apos;re in a private location before entering sensitive data
             </span>
           </InfoBox>
+
+          {/* Import mode toggle */}
+          <ModeToggle>
+            <ModeTab $active={importMode === 'seed'} onClick={() => setImportMode('seed')}>
+              📝 Seed Phrase
+            </ModeTab>
+            <ModeTab $active={importMode === 'privatekey'} onClick={() => setImportMode('privatekey')}>
+              🔑 Private Key
+            </ModeTab>
+          </ModeToggle>
 
           <form onSubmit={handleSubmit}>
             <Stack gap="16px">
@@ -241,19 +293,36 @@ export const ImportAccount = () => {
                 </InfoBox>
               )}
 
-              <div>
-                <Label htmlFor="seedPhrase">Seed Phrase</Label>
-                <StyledTextarea
-                  id="seedPhrase"
-                  value={seedPhrase}
-                  onChange={(e) => setSeedPhrase(e.target.value)}
-                  placeholder="word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12 word13 word14 word15"
-                  disabled={isLoading}
-                  autoFocus
-                  spellCheck={false}
-                  autoComplete="off"
-                />
-              </div>
+              {importMode === 'seed' ? (
+                <div>
+                  <Label htmlFor="seedPhrase">Seed Phrase</Label>
+                  <StyledTextarea
+                    id="seedPhrase"
+                    value={seedPhrase}
+                    onChange={(e) => setSeedPhrase(e.target.value)}
+                    placeholder="word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12 word13 word14 word15"
+                    disabled={isLoading}
+                    autoFocus
+                    spellCheck={false}
+                    autoComplete="off"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <Label htmlFor="privateKey">Private Key</Label>
+                  <StyledTextarea
+                    id="privateKey"
+                    value={privateKey}
+                    onChange={(e) => setPrivateKey(e.target.value)}
+                    placeholder="Enter your base58-encoded private key"
+                    disabled={isLoading}
+                    autoFocus
+                    spellCheck={false}
+                    autoComplete="off"
+                    style={{ minHeight: '80px' }}
+                  />
+                </div>
+              )}
 
               <Input
                 type="password"
@@ -283,13 +352,13 @@ export const ImportAccount = () => {
                 isLoading={isLoading}
                 disabled={
                   isLoading ||
-                  !seedPhrase.trim() ||
+                  (importMode === 'seed' ? !seedPhrase.trim() : !privateKey.trim()) ||
                   !password.trim() ||
                   (isFirstAccount && !accountName.trim())
                 }
                 fullWidth
               >
-                {isLoading ? 'Importing...' : isFirstAccount ? 'Create Wallet' : 'Import Account'}
+                {isLoading ? 'Importing...' : isFirstAccount ? 'Import Wallet' : 'Import Account'}
               </Button>
 
               <HelpText>
