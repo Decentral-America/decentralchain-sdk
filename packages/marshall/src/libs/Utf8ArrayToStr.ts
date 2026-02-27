@@ -1,27 +1,31 @@
-var utf8ArrayToStr = (function () {
-  var charCache = new Array(128);  // Preallocate the cache for the common single byte chars
+var utf8ArrayToStr = function () {
+  var charCache = new Array(128); // Preallocate the cache for the common single byte chars
   var charFromCodePt = String.fromCodePoint || String.fromCharCode;
-  var result:any = [];
+  var result: any = [];
 
-  return function (array:any) {
+  return function (array: any) {
     var codePt, byte1;
     var buffLen = array.length;
 
     result.length = 0;
 
-    for (var i = 0; i < buffLen;) {
+    for (var i = 0; i < buffLen; ) {
       byte1 = array[i++];
 
-      if (byte1 <= 0x7F) {
+      if (byte1 <= 0x7f) {
         codePt = byte1;
-      } else if (byte1 <= 0xDF) {
-        codePt = ((byte1 & 0x1F) << 6) | (array[i++] & 0x3F);
-      } else if (byte1 <= 0xEF) {
-        codePt = ((byte1 & 0x0F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F);
+      } else if (byte1 <= 0xdf) {
+        codePt = ((byte1 & 0x1f) << 6) | (array[i++] & 0x3f);
+      } else if (byte1 <= 0xef) {
+        codePt = ((byte1 & 0x0f) << 12) | ((array[i++] & 0x3f) << 6) | (array[i++] & 0x3f);
       } else if (typeof String.fromCodePoint === 'function') {
-        codePt = ((byte1 & 0x07) << 18) | ((array[i++] & 0x3F) << 12) | ((array[i++] & 0x3F) << 6) | (array[i++] & 0x3F);
+        codePt =
+          ((byte1 & 0x07) << 18) |
+          ((array[i++] & 0x3f) << 12) |
+          ((array[i++] & 0x3f) << 6) |
+          (array[i++] & 0x3f);
       } else {
-        codePt = 63;    // Cannot convertLongFields four byte code points, so use "?" instead
+        codePt = 63; // Cannot convertLongFields four byte code points, so use "?" instead
         i += 3;
       }
 
@@ -30,6 +34,6 @@ var utf8ArrayToStr = (function () {
 
     return result.join('');
   };
-})
+};
 
 export const Utf8ArrayToStr = utf8ArrayToStr();

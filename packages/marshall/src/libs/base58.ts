@@ -1,19 +1,16 @@
 const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-const ALPHABET_MAP = ALPHABET.split('').reduce((map:any, c, i) => {
+const ALPHABET_MAP = ALPHABET.split('').reduce((map: any, c, i) => {
   map[c] = i;
   return map;
 }, {});
 
-
 export default {
   encode(buffer: Uint8Array): string {
-
     if (!buffer.length) return '';
 
     const digits = [0];
 
     for (let i = 0; i < buffer.length; i++) {
-
       for (let j = 0; j < digits.length; j++) {
         digits[j] <<= 8;
       }
@@ -31,27 +28,26 @@ export default {
         digits.push(carry % 58);
         carry = (carry / 58) | 0;
       }
-
     }
 
     for (let i = 0; buffer[i] === 0 && i < buffer.length - 1; i++) {
       digits.push(0);
     }
 
-    return digits.reverse().map(function (digit) {
-      return ALPHABET[digit];
-    }).join('');
-
+    return digits
+      .reverse()
+      .map(function (digit) {
+        return ALPHABET[digit];
+      })
+      .join('');
   },
 
   decode(string: string): Uint8Array {
-
     if (!string.length) return new Uint8Array(0);
 
     const bytes = [0];
 
     for (let i = 0; i < string.length; i++) {
-
       const c = string[i];
       if (!(c in ALPHABET_MAP)) {
         throw new Error(`There is no character "${c}" in the Base58 sequence!`);
@@ -74,7 +70,6 @@ export default {
         bytes.push(carry & 0xff);
         carry >>= 8;
       }
-
     }
 
     for (let i = 0; string[i] === '1' && i < string.length - 1; i++) {
@@ -82,7 +77,5 @@ export default {
     }
 
     return new Uint8Array(bytes.reverse());
-
-  }
-
+  },
 };

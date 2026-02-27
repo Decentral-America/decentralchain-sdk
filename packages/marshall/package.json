@@ -3,11 +3,25 @@
   "name": "@decentralchain/marshall",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "repository": "https://github.com/Decentral-America/marshall",
+  "repository": "https://github.com/33imattei33/marshall",
   "scripts": {
     "test": "jest",
     "build": "tsc && webpack --config webpack.config.js --env",
-    "prepublishOnly": "npm run build"
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "bulletproof": "npm run format && npm run typecheck && npm test",
+    "bulletproof:check": "npm run format:check && npm run typecheck && npm test",
+    "prepublishOnly": "npm run build",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   },
   "files": [
     "/src",
@@ -26,7 +40,10 @@
     "@types/long": "^4.0.0",
     "@types/node": "^12.12.3",
     "bignumber.js": "^8.0.1",
+    "husky": "^9.1.7",
     "jest": "^24.8.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
     "terser-webpack-plugin": "^1.2.3",
     "ts-jest": "^24.0.2",
     "ts-loader": "^5.3.3",
