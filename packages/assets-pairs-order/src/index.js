@@ -1,13 +1,13 @@
-const Base58 = require('bs58');
+const { default: Base58 } = require('bs58');
 const { compareUint8Arrays } = require('./utils');
 
 const MAINNET_RAW_DATA = require('./mainnet.json');
 const TESTNET_RAW_DATA = require('./testnet.json');
 const ARBITRARY_RAW_DATA = require('./arbitrary.json');
 
-const MAINNET_DATA = MAINNET_RAW_DATA.map(d => d.id);
-const TESTNET_DATA = TESTNET_RAW_DATA.map(d => d.id);
-const ARBITRARY_DATA = ARBITRARY_RAW_DATA.map(d => d.id);
+const MAINNET_DATA = MAINNET_RAW_DATA.map((d) => d.id);
+const TESTNET_DATA = TESTNET_RAW_DATA.map((d) => d.id);
+const ARBITRARY_DATA = ARBITRARY_RAW_DATA.map((d) => d.id);
 
 const orderPair = (predefinedList, first, second) => {
   const firstListIndex = predefinedList.indexOf(first);
@@ -16,9 +16,7 @@ const orderPair = (predefinedList, first, second) => {
   const isSecondInList = Boolean(~secondListIndex);
   switch (true) {
     case isFirstInList && isSecondInList:
-      return firstListIndex > secondListIndex
-        ? [first, second]
-        : [second, first];
+      return firstListIndex > secondListIndex ? [first, second] : [second, first];
     case isFirstInList && !isSecondInList:
       return [second, first];
     case !isFirstInList && isSecondInList:
@@ -30,16 +28,16 @@ const orderPair = (predefinedList, first, second) => {
   }
 };
 
-const curry = function(f) {
+const curry = function (f) {
   var slice = Array.prototype.slice,
     self = f,
     totalargs = self.length,
-    partial = function(args, fn) {
-      return function() {
+    partial = function (args, fn) {
+      return function () {
         return fn.apply({}, args.concat(slice.call(arguments)));
       };
     },
-    fn = function() {
+    fn = function () {
       var args = slice.call(arguments);
       return args.length < totalargs
         ? partial(args, fn)

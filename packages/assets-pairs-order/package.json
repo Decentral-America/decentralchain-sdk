@@ -11,26 +11,40 @@
   "scripts": {
     "build:browser": "rollup -c rollup.config.js",
     "test": "jest",
-    "prepublish": "npm run build:browser"
+    "format": "prettier --write \"src/**/*.{js,json}\" \"*.{js,mjs,json}\"",
+    "format:check": "prettier --check \"src/**/*.{js,json}\" \"*.{js,mjs,json}\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "bulletproof": "npm run format && npm run lint:fix && npm run test",
+    "bulletproof:check": "npm run format:check && npm run lint && npm run test",
+    "prepublish": "npm run build:browser",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,mjs}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-jest": "^22.4.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-env": "^1.6.1",
-    "jest": "^22.4.3",
-    "regenerator-runtime": "^0.11.1",
-    "rollup": "^0.58.0",
-    "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-babel-minify": "^4.0.0",
-    "rollup-plugin-cleanup": "^2.0.1",
-    "rollup-plugin-commonjs": "^9.1.0",
-    "rollup-plugin-json": "^2.3.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-globals": "^1.2.0",
-    "rollup-plugin-node-resolve": "^3.3.0"
+    "@eslint/js": "^10.0.1",
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "eslint": "^10.0.2",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.3.0",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
+    "rollup": "^4.59.0"
   },
   "dependencies": {
-    "bs58": "^4.0.1"
+    "bs58": "^6.0.0"
   }
 }
