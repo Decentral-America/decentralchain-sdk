@@ -1,6 +1,6 @@
 // Type definitions for assets-pair-order
 // Definitions by: ishmidt
-declare module '@waves/assets-pairs-order' {
+declare module '@decentralchain/assets-pairs-order' {
   type TPair = [string, string];
   export type TOrderPair = (a: string, b: string) => TPair;
 
@@ -13,5 +13,5 @@ declare module '@waves/assets-pairs-order' {
 
   export const MAINNET_DATA: string[];
   export const TESTNET_DATA: string[];
-  export const ARBITRARY_NETWORK_DATA: string[];
+  export const ARBITRARY_DATA: string[];
 }

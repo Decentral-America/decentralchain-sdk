@@ -1,5 +1,5 @@
 const Base58 = require('bs58');
-const { compareUint8Arrays, isPair, isEmptyArray } = require('./utils');
+const { compareUint8Arrays } = require('./utils');
 
 const MAINNET_RAW_DATA = require('./mainnet.json');
 const TESTNET_RAW_DATA = require('./testnet.json');

@@ -1,17 +1,17 @@
 {
-  "name": "@waves/assets-pairs-order",
+  "name": "@decentralchain/assets-pairs-order",
   "version": "4.0.0",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wavesplatform/assets-pairs-order"
+    "url": "https://github.com/Decentral-America/assets-pairs-order"
   },
   "scripts": {
     "build:browser": "rollup -c rollup.config.js",
     "test": "jest",
-    "prepublish": "yarn test && yarn build:browser"
+    "prepublish": "npm run build:browser"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
