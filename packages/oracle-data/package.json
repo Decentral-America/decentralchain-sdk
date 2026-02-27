@@ -1,14 +1,25 @@
 {
-  "name": "@waves/oracle-data",
+  "name": "@decentralchain/oracle-data",
   "version": "0.0.6",
+  "description": "Oracle data parsing and encoding utilities for the DecentralChain blockchain",
   "dependencies": {},
   "main": "dist/index.js",
   "types": "src/index.ts",
   "license": "MIT",
   "repository": {
-    "type": "GIT",
-    "url": "https://github.com/wavesplatform/oracle-data"
+    "type": "git",
+    "url": "https://github.com/Decentral-America/oracle-data"
   },
+  "homepage": "https://github.com/Decentral-America/oracle-data#readme",
+  "bugs": {
+    "url": "https://github.com/Decentral-America/oracle-data/issues"
+  },
+  "keywords": [
+    "decentralchain",
+    "oracle",
+    "blockchain",
+    "data"
+  ],
   "scripts": {
     "build": "tsc && NODE_ENV=production webpack --env.production --env.platform=web",
     "postpublish": "git push",
