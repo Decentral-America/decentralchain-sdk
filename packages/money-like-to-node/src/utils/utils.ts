@@ -1,7 +1,7 @@
 import { TLong, TMoney } from '../types';
 import { expression } from '@babel/template';
-import { IWavesGuiExchangeOrder } from '../toNodeEntities/exchange';
-import { TWavesGuiEntity } from '../toNodeEntities';
+import { IDCCGuiExchangeOrder } from '../toNodeEntities/exchange';
+import { TDCCGuiEntity } from '../toNodeEntities';
 
 export function getAssetId(money: TMoney): string;
 export function getAssetId(money: TLong | null | undefined): null;

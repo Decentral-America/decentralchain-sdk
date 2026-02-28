@@ -22,7 +22,7 @@ import {
     TInvokeScriptCallArgument,
     TDataTransactionEntry,
     TTransaction,
-} from '@waves/ts-types';
+} from '@decentralchain/ts-types';
 import { TYPES } from '../constants';
 import { isOrder, map } from '../utils';
 
@@ -70,8 +70,8 @@ export const reissue = <FROM, TO, TX extends IReissueTransaction<FROM>>(tx: TX, 
 
 export const burn = <FROM, TO, TX extends IBurnTransaction<FROM>&{ amount?: any }>(tx: TX, factory: IFactory<FROM, TO>) => ({
     ...defaultConvert(tx, factory),
-    amount: tx.amount ? factory(tx.amount) : factory(tx.quantity as FROM),
-    quantity: tx.amount ? factory(tx.amount) : factory(tx.quantity as FROM)
+    amount: tx.amount ? factory(tx.amount) : factory((tx as any).quantity as FROM),
+    quantity: tx.amount ? factory(tx.amount) : factory((tx as any).quantity as FROM)
 });
 
 export const order = <FROM, TO, O extends IExchangeTransactionOrderWithProofs<FROM>>(data: O, factory: IFactory<FROM, TO>): TReplaceParam<O, 'price' | 'amount' | 'matcherFee', TO> => ({

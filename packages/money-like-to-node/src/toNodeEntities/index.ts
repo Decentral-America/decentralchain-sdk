@@ -1,26 +1,26 @@
-import { alias, IWavesGuiAlias } from './alias';
-import { burn, TWavesGuiBurn } from './burn';
-import { cancelLease, IWavesGuiCancelLease } from './cancelLease';
-import { data, IWavesGuiData } from './data';
-import { exchange, remapOrder as order, IWavesGuiExchangeOrder, IWavesGuiExchange } from './exchange';
-import { issue, IWavesGuiIssue } from './issue';
-import { reissue, TWavesGuiReissue } from './reissue';
-import { lease, IWavesGuiLease } from './lease';
-import { massTransfer, TWavesGuiMassTransfer } from './massTransfer';
-import { setAssetScript, IWavesGuiSetAssetScript } from './setAssetScript';
-import { setScript, IWavesGuiSetScript } from './setScript';
-import { sponsorship, IWavesGuiSponsorship } from './sponsorship';
-import { transfer, IWavesGuiTransfer } from './transfer';
+import { alias, IDCCGuiAlias } from './alias';
+import { burn, TDCCGuiBurn } from './burn';
+import { cancelLease, IDCCGuiCancelLease } from './cancelLease';
+import { data, IDCCGuiData } from './data';
+import { exchange, remapOrder as order, IDCCGuiExchangeOrder, IDCCGuiExchange } from './exchange';
+import { issue, IDCCGuiIssue } from './issue';
+import { reissue, TDCCGuiReissue } from './reissue';
+import { lease, IDCCGuiLease } from './lease';
+import { massTransfer, TDCCGuiMassTransfer } from './massTransfer';
+import { setAssetScript, IDCCGuiSetAssetScript } from './setAssetScript';
+import { setScript, IDCCGuiSetScript } from './setScript';
+import { sponsorship, IDCCGuiSponsorship } from './sponsorship';
+import { transfer, IDCCGuiTransfer } from './transfer';
 import {
     IExchangeTransactionOrderWithProofs, ISponsorshipTransaction,
     TTransaction,
     TTransactionMap
-} from '@waves/ts-types';
+} from '@decentralchain/ts-types';
 import { TYPES } from '../constants';
 import { TWithPartialFee } from '../types';
 import { isOrder } from '../utils';
-import { invokeScript, IWavesGuiInvokeScript } from './invokeScript';
-import { updateAssetInfo, IWavesGuiUpdateAssetInfo } from "./updateAssetInfo";
+import { invokeScript, IDCCGuiInvokeScript } from './invokeScript';
+import { updateAssetInfo, IDCCGuiUpdateAssetInfo } from "./updateAssetInfo";
 
 
 export const node = {
@@ -33,24 +33,24 @@ export const node = {
 };
 
 export {
-    IWavesGuiAlias,
-    TWavesGuiBurn,
-    IWavesGuiCancelLease,
-    IWavesGuiData,
-    IWavesGuiExchange,
-    IWavesGuiIssue,
-    TWavesGuiReissue,
-    IWavesGuiLease,
-    TWavesGuiMassTransfer,
-    IWavesGuiSetAssetScript,
-    IWavesGuiSetScript,
-    IWavesGuiSponsorship,
-    IWavesGuiTransfer,
+    IDCCGuiAlias,
+    TDCCGuiBurn,
+    IDCCGuiCancelLease,
+    IDCCGuiData,
+    IDCCGuiExchange,
+    IDCCGuiIssue,
+    TDCCGuiReissue,
+    IDCCGuiLease,
+    TDCCGuiMassTransfer,
+    IDCCGuiSetAssetScript,
+    IDCCGuiSetScript,
+    IDCCGuiSponsorship,
+    IDCCGuiTransfer,
 };
 
-export function toNode(item: IWavesGuiExchangeOrder): IExchangeTransactionOrderWithProofs<string>;
-export function toNode<TX extends TWavesGuiEntity, TYPE extends TX['type'] = TX['type']>(item: TX): TWithPartialFee<TTransactionMap<string>[TYPE]>;
-export function toNode(item: TWavesGuiEntity | IWavesGuiExchangeOrder): TWithPartialFee<TTransaction<string>> | IExchangeTransactionOrderWithProofs<string> {
+export function toNode(item: IDCCGuiExchangeOrder): IExchangeTransactionOrderWithProofs<string>;
+export function toNode<TX extends TDCCGuiEntity, TYPE extends TX['type'] = TX['type']>(item: TX): TWithPartialFee<TTransactionMap<string>[TYPE]>;
+export function toNode(item: TDCCGuiEntity | IDCCGuiExchangeOrder): TWithPartialFee<TTransaction<string>> | IExchangeTransactionOrderWithProofs<string> {
 
     if (isOrder(item)) {
         return order(item);
@@ -93,18 +93,18 @@ export function toNode(item: TWavesGuiEntity | IWavesGuiExchangeOrder): TWithPar
 }
 
 
-export type TWavesGuiEntity = IWavesGuiAlias
-    | TWavesGuiBurn
-    | IWavesGuiCancelLease
-    | IWavesGuiData
-    | IWavesGuiExchange
-    | IWavesGuiIssue
-    | TWavesGuiReissue
-    | IWavesGuiLease
-    | TWavesGuiMassTransfer
-    | IWavesGuiSetAssetScript
-    | IWavesGuiSetScript
-    | IWavesGuiSponsorship
-    | IWavesGuiTransfer
-    | IWavesGuiInvokeScript
-    | IWavesGuiUpdateAssetInfo;
+export type TDCCGuiEntity = IDCCGuiAlias
+    | TDCCGuiBurn
+    | IDCCGuiCancelLease
+    | IDCCGuiData
+    | IDCCGuiExchange
+    | IDCCGuiIssue
+    | TDCCGuiReissue
+    | IDCCGuiLease
+    | TDCCGuiMassTransfer
+    | IDCCGuiSetAssetScript
+    | IDCCGuiSetScript
+    | IDCCGuiSponsorship
+    | IDCCGuiTransfer
+    | IDCCGuiInvokeScript
+    | IDCCGuiUpdateAssetInfo;
