@@ -5,7 +5,7 @@ export const factory = <T, R extends Record<string, any>>(transform: { [Key in k
             try {
                 const value = transformer(data);
                 return Object.assign(acc, { [name]: value });
-            } catch (e) {
+            } catch (e: any) {
                 errors.push({
                     path: name,
                     message: e.message

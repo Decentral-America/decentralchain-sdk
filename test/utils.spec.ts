@@ -1,6 +1,6 @@
 import { head, getCoins, getAssetId, curry } from '../src/utils';
-import { Money, BigNumber } from '@waves/data-entities';
-import { WAVES_ASSET } from './transactionData';
+import { Money, BigNumber } from '@decentralchain/data-entities';
+import { DCC_ASSET } from './transactionData';
 
 
 describe('Utils test', () => {
@@ -10,14 +10,14 @@ describe('Utils test', () => {
     });
 
     it('getCoins', () => {
-        expect(getCoins(new Money('100', WAVES_ASSET))).toBe('100');
-        expect(typeof getCoins(new Money('100', WAVES_ASSET))).toBe('string');
+        expect(getCoins(new Money('100', DCC_ASSET))).toBe('100');
+        expect(typeof getCoins(new Money('100', DCC_ASSET))).toBe('string');
         expect(getCoins(new BigNumber('100'))).toBe('100');
         expect(typeof getCoins(new BigNumber('100'))).toBe('string');
     });
 
     it('getCoins', () => {
-        expect(getAssetId(new Money('100', WAVES_ASSET))).toBe('WAVES');
+        expect(getAssetId(new Money('100', DCC_ASSET))).toBe('DCC');
     });
 
     it('curry', () => {

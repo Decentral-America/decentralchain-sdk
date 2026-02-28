@@ -4,7 +4,7 @@ import {
     IInvokeScriptPayment,
     IInvokeScriptTransaction,
     TInvokeScriptCallArgument
-} from '@waves/ts-types';
+} from '@decentralchain/ts-types';
 import { factory } from '../core/factory';
 import { TLong, TMoney, TWithPartialFee } from '../types';
 import { getDefaultTransform, IDefaultGuiTx } from './general';
@@ -34,11 +34,11 @@ const processPayment = factory<TMoney, IInvokeScriptPayment<string>>({
     assetId: getAssetId
 });
 
-export const invokeScript = factory<IWavesGuiInvokeScript, TWithPartialFee<IInvokeScriptTransaction<string>>>({
+export const invokeScript = factory<IDCCGuiInvokeScript, TWithPartialFee<IInvokeScriptTransaction<string>>>({
     ...getDefaultTransform(),
     chainId: prop('chainId'),
     dApp: prop('dApp'),
-    feeAssetId: pipe<IWavesGuiInvokeScript, TMoney | TLong | undefined | null, string | null, string>(prop('fee'), getAssetId, defaultTo('WAVES')),
+    feeAssetId: pipe<IDCCGuiInvokeScript, TMoney | TLong | undefined | null, string | null, string>(prop('fee'), getAssetId, defaultTo('DCC')),
     call: pipe(
         prop('call'),
         ifElse(
@@ -57,7 +57,7 @@ export const invokeScript = factory<IWavesGuiInvokeScript, TWithPartialFee<IInvo
     )
 });
 
-export interface IWavesGuiInvokeScript extends IDefaultGuiTx<typeof TYPES.INVOKE_SCRIPT> {
+export interface IDCCGuiInvokeScript extends IDefaultGuiTx<typeof TYPES.INVOKE_SCRIPT> {
     dApp: string;
     call?: IInvokeScriptCall<TLong> | null | undefined;
     payment?: Array<TMoney> | null | undefined;

@@ -1,10 +1,10 @@
 import { TEST_DATA } from './transactionData';
 import { toNode, node } from '../src/toNodeEntities';
 import { TYPES } from '../src/constants';
-import { TTransactionType } from '@waves/ts-types';
+import { TTransactionType } from '@decentralchain/ts-types';
 
 
-describe('From Waves entity to node', () => {
+describe('From DecentralChain entity to node', () => {
 
     TEST_DATA.forEach((item, i) => {
 

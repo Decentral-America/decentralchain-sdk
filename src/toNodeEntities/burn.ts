@@ -1,37 +1,39 @@
 import { TYPES } from '../constants';
-import { IBurnTransaction } from '@waves/ts-types';
+import { IBurnTransaction } from '@decentralchain/ts-types';
 import { factory } from '../core/factory';
 import { TLong, TMoney, TWithPartialFee } from '../types';
 import { getDefaultTransform, IDefaultGuiTx } from './general';
 import { emptyError, getAssetId, getCoins, has, ifElse, pipe, prop } from '../utils';
 
 
-export const burn = factory<TWavesGuiBurn, TWithPartialFee<IBurnTransaction<string>>>({
+const burnTransform: any = {
     ...getDefaultTransform(),
-    assetId: pipe<TWavesGuiBurn, string, string>(
-        ifElse<TWavesGuiBurn, string, string>(
+    assetId: pipe<TDCCGuiBurn, string, string>(
+        ifElse<TDCCGuiBurn, string, string>(
             has('assetId'),
             prop<any, 'assetId'>('assetId'),
             pipe<any, TMoney, string>(
-                prop<IWavesGuiBurnMoney, 'quantity'>('quantity'),
+                prop<IDCCGuiBurnMoney, 'quantity'>('quantity'),
                 getAssetId
             )
         ),
         emptyError('Has no assetId!')
     ),
-    quantity: pipe<TWavesGuiBurn, TMoney | TLong, string>(prop('quantity'), getCoins),
-    chainId: prop('chainId')
-});
+    quantity: pipe<TDCCGuiBurn, TMoney | TLong, string>(prop('quantity'), getCoins),
+    chainId: (prop as any)('chainId')
+};
 
-export interface IWavesGuiBurnMoney extends IDefaultGuiTx<typeof TYPES.BURN> {
+export const burn = factory<TDCCGuiBurn, TWithPartialFee<IBurnTransaction<string>>>(burnTransform as any);
+
+export interface IDCCGuiBurnMoney extends IDefaultGuiTx<typeof TYPES.BURN> {
     quantity: TMoney;
     chainId: number;
 }
 
-export interface IWavesGuiBurnLong extends IDefaultGuiTx<typeof TYPES.BURN> {
+export interface IDCCGuiBurnLong extends IDefaultGuiTx<typeof TYPES.BURN> {
     quantity: TLong;
     assetId: string;
     chainId: number;
 }
 
-export type TWavesGuiBurn = IWavesGuiBurnMoney | IWavesGuiBurnLong;
+export type TDCCGuiBurn = IDCCGuiBurnMoney | IDCCGuiBurnLong;

@@ -1,5 +1,5 @@
 import { TYPES } from '../constants';
-import { ISponsorshipTransaction } from '@waves/ts-types';
+import { ISponsorshipTransaction } from '@decentralchain/ts-types';
 import { factory } from '../core/factory';
 import { TMoney, TWithPartialFee } from '../types';
 import { getDefaultTransform, IDefaultGuiTx } from './general';
@@ -9,16 +9,16 @@ export interface IUpdatedISponsorshipTransaction<LONG> extends Omit<ISponsorship
     minSponsoredAssetFee: LONG | null;
 }
 
-export const sponsorship = factory<IWavesGuiSponsorship, TWithPartialFee<IUpdatedISponsorshipTransaction<string>>>({
+export const sponsorship = factory<IDCCGuiSponsorship, TWithPartialFee<IUpdatedISponsorshipTransaction<string>>>({
     ...getDefaultTransform(),
-    assetId: pipe<IWavesGuiSponsorship, TMoney, string>(prop('minSponsoredAssetFee'), getAssetId),
+    assetId: pipe<IDCCGuiSponsorship, TMoney, string>(prop('minSponsoredAssetFee'), getAssetId),
     minSponsoredAssetFee: ifElse(
-        pipe<IWavesGuiSponsorship, TMoney, string, boolean>(prop('minSponsoredAssetFee'), getCoins, isStopSponsorship),
+        pipe<IDCCGuiSponsorship, TMoney, string, boolean>(prop('minSponsoredAssetFee'), getCoins, isStopSponsorship),
         () => null,
-        pipe<IWavesGuiSponsorship, TMoney, string>(prop('minSponsoredAssetFee'), getCoins)
+        pipe<IDCCGuiSponsorship, TMoney, string>(prop('minSponsoredAssetFee'), getCoins)
     )
 });
 
-export interface IWavesGuiSponsorship extends IDefaultGuiTx<typeof TYPES.SPONSORSHIP> {
+export interface IDCCGuiSponsorship extends IDefaultGuiTx<typeof TYPES.SPONSORSHIP> {
     minSponsoredAssetFee: TMoney;
 }

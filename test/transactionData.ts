@@ -1,14 +1,14 @@
 import { TYPES } from '../src/constants';
-import { Asset, Money } from '@waves/data-entities';
-import { BigNumber } from '@waves/data-entities/dist/libs/bignumber';
-import { TWavesGuiEntity } from '../src/toNodeEntities';
-import { TTransaction } from '@waves/ts-types';
+import { Asset, Money } from '@decentralchain/data-entities';
+import { BigNumber } from '@decentralchain/data-entities/dist/libs/bignumber';
+import { TDCCGuiEntity } from '../src/toNodeEntities';
+import { TTransaction } from '@decentralchain/ts-types';
 import { TWithPartialFee } from '../src/types';
 
-export const WAVES_ASSET = new Asset({
-    ticker: 'WAVES',
-    id: 'WAVES',
-    name: 'Waves',
+export const DCC_ASSET = new Asset({
+    ticker: 'DCC',
+    id: 'DCC',
+    name: 'DecentralChain',
     precision: 8,
     description: '',
     height: 0,
@@ -39,7 +39,7 @@ export const TEST_DATA: Array<ITestData> = [
             version: 1,
             senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
             timestamp: 1555398380418,
-            fee: new Money(100000000, WAVES_ASSET),
+            fee: new Money(100000000, DCC_ASSET),
             name: 'test',
             description: 'test description',
             precision: 2,
@@ -69,7 +69,7 @@ export const TEST_DATA: Array<ITestData> = [
             version: 1,
             senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
             timestamp: 1555398380418,
-            fee: new Money(100000000, WAVES_ASSET),
+            fee: new Money(100000000, DCC_ASSET),
             name: 'test',
             description: 'test description',
             precision: 2,
@@ -101,7 +101,7 @@ export const TEST_DATA: Array<ITestData> = [
             timestamp: 1555398380418,
             fee: {
                 coins: '1000000',
-                assetId: WAVES_ASSET.id
+                assetId: DCC_ASSET.id
             },
             amount: new Money(100000, BTC_ASSET),
             recipient: 'merry'
@@ -115,7 +115,7 @@ export const TEST_DATA: Array<ITestData> = [
             attachment: '',
             assetId: BTC_ASSET.id,
             amount: '100000',
-            feeAssetId: 'WAVES',
+            feeAssetId: 'DCC',
             recipient: 'merry'
         }
     } as ITestData,
@@ -126,7 +126,7 @@ export const TEST_DATA: Array<ITestData> = [
             senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
             timestamp: 1555398380418,
             fee: new Money(100, BTC_ASSET),
-            amount: new Money(100000, WAVES_ASSET),
+            amount: new Money(100000, DCC_ASSET),
             recipient: 'merry'
         },
         node: {
@@ -136,7 +136,7 @@ export const TEST_DATA: Array<ITestData> = [
             timestamp: 1555398380418,
             fee: '100',
             attachment: '',
-            assetId: 'WAVES',
+            assetId: 'DCC',
             amount: '100000',
             feeAssetId: BTC_ASSET.id,
             recipient: 'merry'
@@ -213,7 +213,7 @@ export const TEST_DATA: Array<ITestData> = [
             quantity: '10000',
             fee: '10000'
         }
-    } as ITestData,
+    } as unknown as ITestData,
     {
         gui: {
             type: TYPES.EXCHANGE,
@@ -225,7 +225,7 @@ export const TEST_DATA: Array<ITestData> = [
                 matcherPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9e',
                 orderType: 'buy',
                 price: {
-                    assetId: WAVES_ASSET.id,
+                    assetId: DCC_ASSET.id,
                     coins: '1'
                 },
                 amount: {
@@ -233,7 +233,7 @@ export const TEST_DATA: Array<ITestData> = [
                     coins: '2'
                 },
                 matcherFee: {
-                    assetId: WAVES_ASSET.id,
+                    assetId: DCC_ASSET.id,
                     coins: '10000'
                 },
                 timestamp: 1555398380418,
@@ -246,7 +246,7 @@ export const TEST_DATA: Array<ITestData> = [
                 matcherPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9e',
                 orderType: 'sell',
                 price: {
-                    assetId: WAVES_ASSET.id,
+                    assetId: DCC_ASSET.id,
                     coins: '1'
                 },
                 amount: {
@@ -254,7 +254,7 @@ export const TEST_DATA: Array<ITestData> = [
                     coins: '2'
                 },
                 matcherFee: {
-                    assetId: WAVES_ASSET.id,
+                    assetId: DCC_ASSET.id,
                     coins: '10000'
                 },
                 timestamp: 1555398380418,
@@ -265,15 +265,15 @@ export const TEST_DATA: Array<ITestData> = [
             price: 1,
             amount: '2',
             buyMatcherFee: {
-                assetId: WAVES_ASSET.id,
+                assetId: DCC_ASSET.id,
                 coins: '10000'
             },
             sellMatcherFee: {
-                assetId: WAVES_ASSET.id,
+                assetId: DCC_ASSET.id,
                 coins: '10000'
             },
             fee: {
-                assetId: WAVES_ASSET.id,
+                assetId: DCC_ASSET.id,
                 coins: '300000'
             }
         },
@@ -287,7 +287,7 @@ export const TEST_DATA: Array<ITestData> = [
                 version: 1,
                 assetPair: {
                     amountAsset: BTC_ASSET.id,
-                    priceAsset: WAVES_ASSET.id
+                    priceAsset: DCC_ASSET.id
                 },
                 orderType: 'buy',
                 price: '1',
@@ -295,7 +295,7 @@ export const TEST_DATA: Array<ITestData> = [
                 timestamp: 1555398380418,
                 expiration: 1555398380418 + 1000 * 60 * 60 * 24,
                 matcherFee: '10000',
-                matcherFeeAssetId: WAVES_ASSET.id,
+                matcherFeeAssetId: DCC_ASSET.id,
                 senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
                 proofs: ['EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c']
             },
@@ -304,7 +304,7 @@ export const TEST_DATA: Array<ITestData> = [
                 version: 1,
                 assetPair: {
                     amountAsset: BTC_ASSET.id,
-                    priceAsset: WAVES_ASSET.id
+                    priceAsset: DCC_ASSET.id
                 },
                 orderType: 'sell',
                 price: '1',
@@ -312,7 +312,7 @@ export const TEST_DATA: Array<ITestData> = [
                 timestamp: 1555398380418,
                 expiration: 1555398380418 + 1000 * 60 * 60 * 24,
                 matcherFee: '10000',
-                matcherFeeAssetId: WAVES_ASSET.id,
+                matcherFeeAssetId: DCC_ASSET.id,
                 senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
                 proofs: ['EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c']
             },
@@ -330,7 +330,7 @@ export const TEST_DATA: Array<ITestData> = [
             senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
             timestamp: 1555398380418,
             amount: {
-                assetId: WAVES_ASSET.id,
+                assetId: DCC_ASSET.id,
                 coins: '100000000'
             },
             recipient: 'merry',
@@ -394,7 +394,7 @@ export const TEST_DATA: Array<ITestData> = [
             transfers: [
                 {
                     amount: {
-                        assetId: WAVES_ASSET.id,
+                        assetId: DCC_ASSET.id,
                         coins: '10'
                     },
                     recipient: 'merry'
@@ -407,7 +407,7 @@ export const TEST_DATA: Array<ITestData> = [
             version: 1,
             senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
             timestamp: 1555398380418,
-            assetId: WAVES_ASSET.id,
+            assetId: DCC_ASSET.id,
             attachment: 'dfasfsdafsdaexe234x2433',
             transfers: [
                 {
@@ -550,7 +550,7 @@ export const TEST_DATA: Array<ITestData> = [
             timestamp: 1555398380418,
             dApp: 'test',
             chainId: 87,
-            fee: new Money(100, WAVES_ASSET)
+            fee: new Money(100, DCC_ASSET)
         },
         node: {
             type: TYPES.INVOKE_SCRIPT,
@@ -562,7 +562,7 @@ export const TEST_DATA: Array<ITestData> = [
             timestamp: 1555398380418,
             chainId: 87,
             fee: '100',
-            feeAssetId: WAVES_ASSET.id
+            feeAssetId: DCC_ASSET.id
         }
     },
     {
@@ -576,9 +576,9 @@ export const TEST_DATA: Array<ITestData> = [
                 function: 'default',
                 args: []
             },
-            payment: [new Money(100, WAVES_ASSET)],
+            payment: [new Money(100, DCC_ASSET)],
             chainId: 87,
-            fee: new Money(100, WAVES_ASSET)
+            fee: new Money(100, DCC_ASSET)
         },
         node: {
             type: TYPES.INVOKE_SCRIPT,
@@ -588,17 +588,17 @@ export const TEST_DATA: Array<ITestData> = [
                 function: 'default',
                 args: []
             },
-            payment: [{ amount: '100', assetId: WAVES_ASSET.id }],
+            payment: [{ amount: '100', assetId: DCC_ASSET.id }],
             senderPublicKey: 'EM1XUpKdct1eE2mgmdvr4VA4raXMKvYKumCbnArtcQ9c',
             timestamp: 1555398380418,
             chainId: 87,
             fee: '100',
-            feeAssetId: WAVES_ASSET.id
+            feeAssetId: DCC_ASSET.id
         }
     },
 ];
 
 interface ITestData {
-    gui: TWavesGuiEntity;
+    gui: TDCCGuiEntity;
     node: TWithPartialFee<TTransaction<string>>;
 }

@@ -12,6 +12,7 @@
     ],
     "declaration": true,
     "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
     "outDir": "./dist",
     "experimentalDecorators": true
   },

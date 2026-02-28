@@ -1,12 +1,12 @@
 import { ALIAS, TYPES } from '../constants';
-import { IAliasTransaction } from '@waves/ts-types';
+import { IAliasTransaction } from '@decentralchain/ts-types';
 import { factory } from '../core/factory';
 import { getDefaultTransform, IDefaultGuiTx } from './general';
 import { prop, pipe, length, lte, gte } from '../utils';
 import { charsInDictionary, createValidator, isString, requiredValidator, validate } from '../validators';
 
 
-export const alias = factory<IWavesGuiAlias, IAliasTransaction<string>>({
+export const alias = factory<IDCCGuiAlias, IAliasTransaction<string>>({
     ...getDefaultTransform(),
     alias: pipe(
         prop('alias'),
@@ -20,6 +20,6 @@ export const alias = factory<IWavesGuiAlias, IAliasTransaction<string>>({
     )
 });
 
-export interface IWavesGuiAlias extends IDefaultGuiTx<typeof TYPES.ALIAS> {
+export interface IDCCGuiAlias extends IDefaultGuiTx<typeof TYPES.ALIAS> {
     alias: string;
 }
