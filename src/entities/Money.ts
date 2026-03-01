@@ -122,12 +122,15 @@ export class Money {
   /**
    * Divide the coin amounts of two Money instances.
    *
-   * @param money - Must share the same asset.
+   * @param money - Must share the same asset and have non-zero coins.
    * @returns A new Money instance.
-   * @throws {Error} If assets do not match.
+   * @throws {Error} If assets do not match or divisor is zero.
    */
   public div(money: Money): Money {
     this._matchAssets(money);
+    if (money.getCoins().isZero()) {
+      throw new Error('Division by zero: cannot divide Money by a zero amount');
+    }
     return new Money(this.getCoins().div(money.getCoins()), this.asset);
   }
 
@@ -224,13 +227,29 @@ export class Money {
     }
   }
 
-  /** Return the Money with the greatest value. */
+  /**
+   * Return the Money with the greatest value.
+   *
+   * @param moneyList - One or more Money instances (must share the same asset).
+   * @throws {Error} If no arguments are provided.
+   */
   public static max(...moneyList: Money[]): Money {
+    if (moneyList.length === 0) {
+      throw new Error('Money.max() requires at least one argument');
+    }
     return moneyList.reduce((max, money) => (max.gte(money) ? max : money));
   }
 
-  /** Return the Money with the smallest value. */
+  /**
+   * Return the Money with the smallest value.
+   *
+   * @param moneyList - One or more Money instances (must share the same asset).
+   * @throws {Error} If no arguments are provided.
+   */
   public static min(...moneyList: Money[]): Money {
+    if (moneyList.length === 0) {
+      throw new Error('Money.min() requires at least one argument');
+    }
     return moneyList.reduce((min, money) => (min.lte(money) ? min : money));
   }
 
@@ -248,7 +267,7 @@ export class Money {
    * @returns A new Money instance denominated in `asset`.
    */
   public static convert(money: Money, asset: Asset, exchangeRate: BigNumber | string): Money {
-    if (money.asset === asset) {
+    if (money.asset.id === asset.id) {
       return money;
     }
     const difference = money.asset.precision - asset.precision;

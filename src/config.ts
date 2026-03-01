@@ -33,10 +33,19 @@ export namespace config {
     value?: IConfig[keyof IConfig],
   ): void {
     if (typeof keyOrValues === 'string') {
+      if (!Object.hasOwn(storage, keyOrValues)) {
+        throw new Error(`Unknown config key: "${keyOrValues}"`);
+      }
       if (value !== undefined) {
         Object.assign(storage, { [keyOrValues]: value });
       }
     } else {
+      const validKeys = Object.keys(storage);
+      for (const key of Object.keys(keyOrValues)) {
+        if (!validKeys.includes(key)) {
+          throw new Error(`Unknown config key: "${key}"`);
+        }
+      }
       Object.assign(storage, keyOrValues);
     }
   }
